@@ -17,12 +17,13 @@ const inserirUsuario = async function (usuario, contentType){
     try {
         if(contentType == 'application/json'){
 
-            if(usuario.nome_usuario     == undefined || usuario.nome_usuario     == '' || usuario.nome_usuario     == null || usuario.nome_usuario.length > 50  ||
-               usuario.email            == undefined || usuario.email            == '' || usuario.email            == null || usuario.email.length        > 100 ||
-               usuario.senha            == undefined || usuario.senha            == '' || usuario.senha            == null || usuario.senha.length        > 12  || 
+            if(usuario.nome_usuario     == undefined || usuario.nome_usuario       == '' || usuario.nome_usuario     == null || usuario.nome_usuario.length  > 50  ||
+               usuario.email            == undefined || usuario.email              == '' || usuario.email            == null || usuario.email.length         > 100 ||
+               usuario.senha            == undefined || usuario.senha              == '' || usuario.senha            == null || usuario.senha.length         > 12  ||
+               usuario.palavra_chave    == undefined || usuario.palavra_chave      == '' || usuario.palavra_chave    == null || usuario.palavra_chave.length > 25  ||
                usuario.foto_perfil      == undefined || usuario.foto_perfil.length > 255 ||
-               usuario.data_criacao     == undefined || usuario.data_criacao     == '' || usuario.data_criacao     == null ||
-               usuario.data_atualizacao == undefined || usuario.data_atualizacao == '' || usuario.data_atualizacao == null 
+               usuario.data_criacao     == undefined || usuario.data_criacao       == '' || usuario.data_criacao     == null ||
+               usuario.data_atualizacao == undefined || usuario.data_atualizacao   == '' || usuario.data_atualizacao == null 
             ){
                 return MESSAGE.ERROR_REQUIRED_FIELDS//400
             }else{
@@ -49,12 +50,13 @@ const atualizarUsuario = async function (usuario, id,contentType){
     try {
         if(contentType == 'application/json'){
             
-            if(usuario.nome_usuario     == undefined || usuario.nome_usuario     == '' || usuario.nome_usuario     == null || usuario.nome_usuario.length > 50  ||
-               usuario.email            == undefined || usuario.email            == '' || usuario.email            == null || usuario.email.length        > 100 ||
-               usuario.senha            == undefined || usuario.senha            == '' || usuario.senha            == null || usuario.senha.length        > 12  || 
+            if(usuario.nome_usuario     == undefined || usuario.nome_usuario       == '' || usuario.nome_usuario     == null || usuario.nome_usuario.length  > 50  ||
+               usuario.email            == undefined || usuario.email              == '' || usuario.email            == null || usuario.email.length         > 100 ||
+               usuario.senha            == undefined || usuario.senha              == '' || usuario.senha            == null || usuario.senha.length         > 12  || 
+               usuario.palavra_chave    == undefined || usuario.palavra_chave      == '' || usuario.palavra_chave    == null || usuario.palavra_chave.length > 25  ||
                usuario.foto_perfil      == undefined || usuario.foto_perfil.length > 255 ||
-               usuario.data_criacao     == undefined || usuario.data_criacao     == '' || usuario.data_criacao     == null ||
-               usuario.data_atualizacao == undefined || usuario.data_atualizacao == '' || usuario.data_atualizacao == null ||
+               usuario.data_criacao     == undefined || usuario.data_criacao       == '' || usuario.data_criacao     == null ||
+               usuario.data_atualizacao == undefined || usuario.data_atualizacao   == '' || usuario.data_atualizacao == null ||
                id == undefined || id == '' || id == null || isNaN(id) || id <= 0
             ){
                 return MESSAGE.ERROR_REQUIRED_FIELDS//400

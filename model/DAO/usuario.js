@@ -24,6 +24,7 @@ const insertUsuario = async function (usuario){
                                             nome_usuario,
                                             email,
                                             senha,
+                                            palavra_chave,
                                             foto_perfil,
                                             data_criacao,
                                             data_atualizacao
@@ -31,6 +32,7 @@ const insertUsuario = async function (usuario){
                                             '${usuario.nome_usuario}',
                                             '${usuario.email}',
                                             '${usuario.senha}',
+                                            '${usuario.palavra_chave}',
                                             '${usuario.foto_perfil}',
                                             '${usuario.data_criacao}',
                                             '${usuario.data_atualizacao}'
@@ -52,9 +54,10 @@ const insertUsuario = async function (usuario){
 const updateUsuario = async function (usuario){
 
     try {
-        let sql = `update tbl_usuario set  nome             = '${usuario.nome_usuario}',
+        let sql = `update tbl_usuario set  nome_usuario     = '${usuario.nome_usuario}',
                                            email            = '${usuario.email}',
                                            senha            = '${usuario.senha}',
+                                           palavra_chave    = '${usuario.palavra_chave}',
                                            foto_perfil      = '${usuario.foto_perfil}',
                                            data_criacao     = '${usuario.data_criacao}',
                                            data_atualizacao = '${usuario.data_atualizacao}'

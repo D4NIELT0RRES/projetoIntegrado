@@ -1,9 +1,32 @@
-/**************************************************************************
- * OBJETIVO: API referente ao projeto de gestão de receitas
- * DATA: 20/05/2025
+/*************************************************************************************************
+ * OBJETIVO: API referente ao projeto de GESTÃO DE RECEITAS
+ * DATA: 22/05/2025
  * AUTOR: DANIEL TORRES
  * VERSÃO: 1.0
- *************************************************************************/
+ *================================================================================================ 
+ * 
+ * 
+ * OBSERVAÇÃO:
+ * 
+ * ****************** Para configurar e instalar a API, precisamos das seguites bibliotecas:
+ *                      -> express          npm install express --save
+ *                      -> cors             npm install cors --save
+ *                      -> body-parser      npm install body-parser --save
+ * 
+ * ****************** Para configurar e Instalar o acesso remoto ao Banco de Dados precisamos:
+ *                      -> prisma          npm install prisma --save (conexão com o BD)
+ *                      -> prisma/client   npm install @prisma/client --save (Executa scrips no BD)
+ * 
+ * 
+ * ******************* Após a instalação do prisma e do prisma/client, devemos:
+ * 
+ *                     npx prisma init (Inicializar o prisma no projeto)
+ * 
+ * ******************* Para realizar o sincronismo do prisma com o BD, devemos executar o seguinte comando:
+ * 
+ *                     npx prisma migrate dev                   
+ * 
+ *************************************************************************************************/
 
 //Import das bibliotecas para criar a API
 const express    = require('express')
@@ -44,4 +67,52 @@ app.post('/v1/controle-receita/usuario', cors(), bodyParserJson, async function 
 
     response.status(resultUsuario.status_code)
     response.json(resultUsuario)
+})
+
+//EndPoint para listar usuário no banco de dados 
+app.get('/v1/controle-receita/usuario', cors(), bodyParserJson, async function (request, response) {
+    
+    let resultUsuario = await controllerUsuario.listarUsuario()
+
+    response.status(resultUsuario.status_code)
+    response.json(resultUsuario)
+})
+
+//EndPoint para retornar um usuário pelo ID
+app.get('/v1/controle-receita/usuario/:id', cors(), async function (request,response) {
+    
+    let idUsuario = request.params.id
+    let resultUsuario = await controllerUsuario.buscarUsuario(idUsuario)
+
+    response.status(resultUsuario.status_code)
+    response.json(resultUsuario)
+
+})
+
+//EndPoint para deletar um usuário pelo ID
+app.delete('/v1/controle-receita/usuario/:id', cors(), async function (request,response) {
+    
+    let idUsuario = request.params.id
+    let resultUsuario = await controllerUsuario.excluirUsuario(idUsuario)
+
+    response.status(resultUsuario.status_code)
+    response.json(resultUsuario)
+})
+
+//EndPoint para atualizar um usuário pelo ID
+app.put('/v1/controle-receita/usuario/:id', cors(), bodyParserJson, async function (request,response){
+
+   let contentType = request.headers['content-type']
+   let idUsuario = request.params.id
+   let dadosBody = request.body
+
+   let resultUsuario = await controllerUsuario.atualizarUsuario(dadosBody,idUsuario,contentType)
+
+   response.status(resultUsuario.status_code)
+   response.json(resultUsuario)
+    
+})
+
+app.listen('8080', function(){
+    console.log('API aguardando Requisições...')
 })
