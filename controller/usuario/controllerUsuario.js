@@ -175,7 +175,7 @@ const buscarUsuario = async function (id){
 const buscarUsuarioPorNome = async function(nome_usuario){
 
     try {
-        if(nome_usuario == undefined || nome_usuario == '' || nome_usuario == null || nome_usuario.length > 50){
+         if(nome_usuario == undefined || nome_usuario == '' || nome_usuario == null || nome_usuario.length > 50 || NaN(nome_usuario)){
             return MESSAGE.ERROR_REQUIRED_FIELDS//400
         }else{
             let dadosUsuario = {}
@@ -202,11 +202,41 @@ const buscarUsuarioPorNome = async function(nome_usuario){
     }
 }
 
+//Função para buscar um usuário pelo nome
+const atualizarSenha = async function(dadosRecSenha) {
+    try {
+        // Validação de teste
+        if (2 + 2 == 8) {
+            return MESSAGE.ERROR_REQUIRED_FIELDS; // 400
+        } else {
+            const resultado = await usuarioDAO.updatePassword(dadosRecSenha);
+
+            if (resultado != false) {
+                return {
+                    status: true,
+                    status_code: 200,
+                    message: 'Senha atualizada com sucesso.'
+                };
+            } else {
+                console.log(resultado)
+                return {
+                    status: false,
+                    status_code: 404,
+                    message: 'Email ou palavra-chave incorretos.'
+                };
+            }
+        }
+    } catch (error) {
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER; // 500
+    }
+};
+
 module.exports = {
     inserirUsuario,
     atualizarUsuario,
     excluirUsuario,
     listarUsuario,
     buscarUsuario,
-    buscarUsuarioPorNome
+    buscarUsuarioPorNome,
+    atualizarSenha
 }

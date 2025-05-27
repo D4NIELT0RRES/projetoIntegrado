@@ -89,6 +89,16 @@ app.get('/v1/controle-receita/usuario/:id', cors(), async function (request,resp
 
 })
 
+//EndPoint para retornar um usuário pelo NOME
+app.get('/v1/controle-receita/usuario/:nomeUsuario', cors(), async function (request,response){
+
+    let nomeUsuario = request.params.nomeUsuario
+    let resultUsuario = await controllerUsuario.buscarUsuarioPorNome(nomeUsuario)
+
+    response.status(resultUsuario.status_code)
+    response.json(resultUsuario)
+})
+
 //EndPoint para deletar um usuário pelo ID
 app.delete('/v1/controle-receita/usuario/:id', cors(), async function (request,response) {
     
@@ -112,6 +122,17 @@ app.put('/v1/controle-receita/usuario/:id', cors(), bodyParserJson, async functi
    response.json(resultUsuario)
     
 })
+
+//EndPoint para atualizar a senha pelo email e a palavra chave
+app.put('/v1/controle-receita/usuario', cors(), bodyParserJson, async function(request, response) {
+    let dadosBody = request.body;
+
+    let resultUsuario = await controllerUsuario.atualizarSenha(dadosBody);
+
+    response.status(resultUsuario.status_code);
+    response.json(resultUsuario);
+});
+
 
 app.listen('8080', function(){
     console.log('API aguardando Requisições...')

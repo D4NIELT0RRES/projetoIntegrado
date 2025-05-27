@@ -46,6 +46,7 @@ const insertUsuario = async function (usuario){
             return false
         }       
     }catch(error){
+        console.log(error)
         return false
     }
 }
@@ -118,7 +119,7 @@ const selectAllUsuario = async function (){
 const selectByIdUsuario = async function (id){
 
     try {
-        let idUsuario = id
+        let idUsuario = id        
         let sql = `select * from tbl_usuario where id = ${idUsuario}`
 
         let result = await prisma.$queryRawUnsafe(sql)
@@ -138,7 +139,7 @@ const selectByNomeUsuario = async function (nome){
 
     try {
         let nomeUsuario = nome
-        let sql = `select * from tbl_usuario where name = ${nomeUsuario}`
+        let sql = `select * from tbl_usuario where nome_usuario = ${nomeUsuario}`
 
         let result = await prisma.$queryRawUnsafe(sql)
 
@@ -147,11 +148,39 @@ const selectByNomeUsuario = async function (nome){
         }else{
             return false
         }
-    } catch (error) {
+    }catch(error){
         return false
     }
     
 }
+
+
+
+//Função para buscar no Banco de Dados um email
+const updatePassword = async function (dadosRecSenha){
+
+    try {
+        let sql = `UPDATE tbl_usuario 
+        SET senha = "${dadosRecSenha.senha}"
+        WHERE email = "${dadosRecSenha.email}"
+        AND palavra_chave = "${dadosRecSenha.palavra_chave}";`
+
+        let result = await prisma.$executeRawUnsafe(sql);
+
+        if(result){
+
+            return result
+        }else{
+            return false
+        }
+    }catch(error){
+        console.log(error)
+        return false
+    }
+}
+
+// console.log(updatePassword('gabriel@souza.com.br', '54321', '0511' ))
+
 
 module.exports = {
     insertUsuario,
@@ -159,5 +188,6 @@ module.exports = {
     deleteUsuario,
     selectAllUsuario,
     selectByIdUsuario,
-    selectByNomeUsuario
+    selectByNomeUsuario,
+    updatePassword
 }

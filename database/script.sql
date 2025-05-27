@@ -37,3 +37,6 @@ VALUES (
 select * from tbl_usuario;
 desc tbl_usuario;
 drop table tbl_usuario;
+show tables;
+select * from tbl_usuario where nome_usuario = 'Gabriel Souza';
+select * from tbl_usuario where email = 'gabriel@souza.com.br';
