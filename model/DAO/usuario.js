@@ -181,6 +181,26 @@ const updatePassword = async function (dadosRecSenha){
 
 // console.log(updatePassword('gabriel@souza.com.br', '54321', '0511' ))
 
+//Função para buscar no banco de dados um usuário através do email e senha ->> login
+const loginUsuario = async function (dadosLogin){
+
+    try {
+      
+        let sql = `select * from tbl_usuario where email = "${dadosLogin.email}" and senha = "${dadosLogin.senha}";`
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if(result){
+            return result
+        }else{
+            return false
+        }
+    }catch(error){
+        return false   
+    }
+}
+
+
 
 module.exports = {
     insertUsuario,
@@ -189,5 +209,6 @@ module.exports = {
     selectAllUsuario,
     selectByIdUsuario,
     selectByNomeUsuario,
-    updatePassword
+    updatePassword,
+    loginUsuario
 }

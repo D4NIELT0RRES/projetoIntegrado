@@ -231,6 +231,46 @@ const atualizarSenha = async function(dadosRecSenha) {
     }
 };
 
+
+//Função para inserir um novo ingrediente
+const loginUsuario = async function (dadosLogin, contentType){
+    try {
+        if(contentType == 'application/json'){
+            if(dadosLogin.email == undefined || dadosLogin.email == null || dadosLogin.email == "" || 
+            dadosLogin. senha == undefined || dadosLogin.senha == null || dadosLogin.senha == ""){
+                return MESSAGE.ERROR_REQUIRED_FIELDS
+            }else{
+                let JsonDadosLogin = {}
+                //encaminha os dados do novo sexo para ser inserido no banco de dados
+                let resultLogin = await usuarioDAO.loginUsuario(dadosLogin)
+                if(resultLogin != false || typeof(resultLogin) == 'object'){
+                    if(resultLogin.length >= 1){
+    
+                        JsonDadosLogin.status = true
+                        JsonDadosLogin.status_code = 200
+                        JsonDadosLogin.usuario = resultLogin
+
+                        console.log(JsonDadosLogin)
+    
+                        return JsonDadosLogin//200
+                    }else{
+                        return MESSAGE.ERROR_NOT_FOUND//404
+                    }
+                }else{
+                    return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500
+                }
+
+
+                
+            }
+        }else{
+            return MESSAGE.ERROR_CONTENT_TYPE
+        }
+    } catch (error) {
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+    }
+}
+
 module.exports = {
     inserirUsuario,
     atualizarUsuario,
@@ -238,5 +278,6 @@ module.exports = {
     listarUsuario,
     buscarUsuario,
     buscarUsuarioPorNome,
-    atualizarSenha
+    atualizarSenha,
+    loginUsuario
 }
