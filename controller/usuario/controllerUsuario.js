@@ -21,9 +21,7 @@ const inserirUsuario = async function (usuario, contentType){
                usuario.email            == undefined || usuario.email              == '' || usuario.email            == null || usuario.email.length         > 100 ||
                usuario.senha            == undefined || usuario.senha              == '' || usuario.senha            == null || usuario.senha.length         > 12  ||
                usuario.palavra_chave    == undefined || usuario.palavra_chave      == '' || usuario.palavra_chave    == null || usuario.palavra_chave.length > 25  ||
-               usuario.foto_perfil      == undefined || usuario.foto_perfil.length > 255 ||
-               usuario.data_criacao     == undefined || usuario.data_criacao       == '' || usuario.data_criacao     == null ||
-               usuario.data_atualizacao == undefined || usuario.data_atualizacao   == '' || usuario.data_atualizacao == null 
+               usuario.foto_perfil      == undefined || usuario.foto_perfil.length > 255 
             ){
                 return MESSAGE.ERROR_REQUIRED_FIELDS//400
             }else{
@@ -55,8 +53,6 @@ const atualizarUsuario = async function (usuario, id,contentType){
                usuario.senha            == undefined || usuario.senha              == '' || usuario.senha            == null || usuario.senha.length         > 12  || 
                usuario.palavra_chave    == undefined || usuario.palavra_chave      == '' || usuario.palavra_chave    == null || usuario.palavra_chave.length > 25  ||
                usuario.foto_perfil      == undefined || usuario.foto_perfil.length > 255 ||
-               usuario.data_criacao     == undefined || usuario.data_criacao       == '' || usuario.data_criacao     == null ||
-               usuario.data_atualizacao == undefined || usuario.data_atualizacao   == '' || usuario.data_atualizacao == null ||
                id == undefined || id == '' || id == null || isNaN(id) || id <= 0
             ){
                 return MESSAGE.ERROR_REQUIRED_FIELDS//400
@@ -172,18 +168,18 @@ const buscarUsuario = async function (id){
 }
 
 //Função para buscar um usuário pelo nome
-const buscarUsuarioPorNome = async function(nome_usuario){
+const buscarUsuarioPorNome = async function(nome){
 
     try {
-         if(nome_usuario == undefined || nome_usuario == '' || nome_usuario == null || nome_usuario.length > 50 || NaN(nome_usuario)){
+         if(nome == undefined || nome == '' || nome == null || nome.length < 50 || NaN(nome)){
             return MESSAGE.ERROR_REQUIRED_FIELDS//400
         }else{
             let dadosUsuario = {}
 
-            let resultUsuario = await usuarioDAO.selectByNomeUsuario(String(nome_usuario))
+            let resultUsuario = await usuarioDAO.selectByNomeUsuario(nome)
 
             if(resultUsuario != false || typeof(resultUsuario) == 'object'){
-                if(resultUsuario.length > 50){
+                if(resultUsuario){
 
                     dadosUsuario.status = true
                     dadosUsuario.status_code = 200
@@ -244,7 +240,7 @@ const loginUsuario = async function (dadosLogin, contentType){
                 //encaminha os dados do novo sexo para ser inserido no banco de dados
                 let resultLogin = await usuarioDAO.loginUsuario(dadosLogin)
                 if(resultLogin != false || typeof(resultLogin) == 'object'){
-                    if(resultLogin.length >= 1){
+                    if(resultLogin.length > 0){
     
                         JsonDadosLogin.status = true
                         JsonDadosLogin.status_code = 200

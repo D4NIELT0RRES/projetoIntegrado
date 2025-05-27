@@ -40,3 +40,14 @@ drop table tbl_usuario;
 show tables;
 select * from tbl_usuario where nome_usuario = 'Gabriel Souza';
 select * from tbl_usuario where email = 'gabriel@souza.com.br';
+
+drop table tbl_usuario;
+
+
+UPDATE tbl_usuario 
+SET senha = 'anajulia' 
+WHERE email = 'gabriel@souza.com.br' 
+AND palavra_chave = '0511';
+SELECT ROW_COUNT() AS linhas_afetadas;
+
+select * from tbl_usuario where email = "gabriel@souza.com.br" and senha = "Senh@829";

@@ -25,17 +25,13 @@ const insertUsuario = async function (usuario){
                                             email,
                                             senha,
                                             palavra_chave,
-                                            foto_perfil,
-                                            data_criacao,
-                                            data_atualizacao
+                                            foto_perfil
                                           ) values (
                                             '${usuario.nome_usuario}',
                                             '${usuario.email}',
                                             '${usuario.senha}',
                                             '${usuario.palavra_chave}',
-                                            '${usuario.foto_perfil}',
-                                            '${usuario.data_criacao}',
-                                            '${usuario.data_atualizacao}'
+                                            '${usuario.foto_perfil}'
                                           )`
         //Executa o script SQL no BD e aguarda o retorno no BD
         let result = await prisma.$executeRawUnsafe(sql)
@@ -46,7 +42,7 @@ const insertUsuario = async function (usuario){
             return false
         }       
     }catch(error){
-        console.log(error)
+        console.log(error);
         return false
     }
 }
@@ -59,9 +55,7 @@ const updateUsuario = async function (usuario){
                                            email            = '${usuario.email}',
                                            senha            = '${usuario.senha}',
                                            palavra_chave    = '${usuario.palavra_chave}',
-                                           foto_perfil      = '${usuario.foto_perfil}',
-                                           data_criacao     = '${usuario.data_criacao}',
-                                           data_atualizacao = '${usuario.data_atualizacao}'
+                                           foto_perfil      = '${usuario.foto_perfil}'
                                            where id = ${usuario.id}`
 
         //Executa o script SQL no BD e aguarda o retorno no BD
