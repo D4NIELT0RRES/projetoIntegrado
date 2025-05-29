@@ -65,7 +65,7 @@ app.post('/v1/controle-receita/usuario', cors(), bodyParserJson, async function 
     //Encaminha os dados do body da requisição para a controller inserir no banco de dados
     let resultUsuario = await controllerUsuario.inserirUsuario(dadosBody,contentType)
 
-    response.status(resultUsuario.status)
+    response.status(resultUsuario.status_code)
     response.json(resultUsuario)
 })
 
@@ -90,9 +90,9 @@ app.get('/v1/controle-receita/usuario/:id', cors(), async function (request,resp
 })
 
 //EndPoint para retornar um usuário pelo NOME
-app.get('/v1/controle-receita/usuario/:nomeUsuario', cors(), async function (request,response){
+app.get('/v1/controle-receita/usuario/:nome', cors(), async function (request,response){
 
-    let nomeUsuario = request.params.nomeUsuario
+    let nomeUsuario = request.params.nome
     let resultUsuario = await controllerUsuario.buscarUsuarioPorNome(nomeUsuario)
 
     response.status(resultUsuario.status_code)

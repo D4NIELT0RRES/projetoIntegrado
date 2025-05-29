@@ -53,3 +53,5 @@ SELECT ROW_COUNT() AS linhas_afetadas;
 select * from tbl_usuario where email = "gabriel@souza.com.br" and senha = "Senh@829";
 
 SELECT * FROM tbl_usuario ORDER BY id DESC LIMIT 1;
+
+select * from tbl_usuario where nome_usuario = 'israel' order by id desc limit 1;

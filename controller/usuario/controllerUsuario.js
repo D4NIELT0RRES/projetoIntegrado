@@ -28,14 +28,13 @@ const inserirUsuario = async function (usuario, contentType){
 
                 if (resultUsuario) {
                     return {
-                        status: 201,
+                        status_code: 201,
                         message: "Usuário criado com sucesso",
                         usuario: resultUsuario
                     }
                 } else {
                     return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
                 }
-                
             }
         }else{
             return MESSAGE.ERROR_CONTENT_TYPE//415
@@ -62,20 +61,14 @@ const atualizarUsuario = async function (usuario, id,contentType){
             }else{
                 //Validar se o id existe no Banco de Dados
                 let resultUsuario = await buscarUsuario(parseInt(id))
-                if(resultUsuario.status_code == 200){
-
-                    usuario.id = parseInt(id)
-                    let result = await usuarioDAO.updateUsuario(usuario)
-
-                    if(result){
-                        return MESSAGE.SUCCESS_UPDATE_ITEM//200
-                    }else{
-                        return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500
+                if (resultUsuario) {
+                    return {
+                        status_code: 201,
+                        message: "Usuário criado com sucesso",
+                        usuario: resultUsuario
                     }
-                }else if(resultUsuario.status_code == 404){
-                    return MESSAGE.ERROR_NOT_FOUND//404
-                }else{
-                    return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER//500
+                } else {
+                    return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
                 }
             }
         }else{
@@ -171,18 +164,17 @@ const buscarUsuario = async function (id){
 }
 
 //Função para buscar um usuário pelo nome
-const buscarUsuarioPorNome = async function(nome){
-
+const buscarUsuarioPorNome = async function(nome_usuario){
     try {
-         if(nome == undefined || nome == '' || nome == null || nome.length < 50 || NaN(nome)){
+        if(nome_usuario == undefined || nome_usuario == '' || nome_usuario == null || nome_usuario.length  > 50){
             return MESSAGE.ERROR_REQUIRED_FIELDS//400
         }else{
             let dadosUsuario = {}
 
-            let resultUsuario = await usuarioDAO.selectByNomeUsuario(nome)
+            let resultUsuario = await usuarioDAO.selectByNomeUsuario(nome_usuario)
 
             if(resultUsuario != false || typeof(resultUsuario) == 'object'){
-                if(resultUsuario){
+                if(resultUsuario.length > 0){
 
                     dadosUsuario.status = true
                     dadosUsuario.status_code = 200
@@ -201,13 +193,15 @@ const buscarUsuarioPorNome = async function(nome){
     }
 }
 
+
 //Função para buscar um usuário pelo nome
 const atualizarSenha = async function(dadosRecSenha) {
     try {
         // Validação de teste
-        if (2 + 2 == 8) {
+        if (dadosRecSenha == undefined || dadosRecSenha == '' || dadosRecSenha == null || dadosRecSenha.length > 12) {
             return MESSAGE.ERROR_REQUIRED_FIELDS; // 400
         } else {
+
             const resultado = await usuarioDAO.updatePassword(dadosRecSenha);
 
             if (resultado != false) {
@@ -217,7 +211,6 @@ const atualizarSenha = async function(dadosRecSenha) {
                     message: 'Senha atualizada com sucesso.'
                 };
             } else {
-                console.log(resultado)
                 return {
                     status: false,
                     status_code: 404,
@@ -225,31 +218,31 @@ const atualizarSenha = async function(dadosRecSenha) {
                 };
             }
         }
-    } catch (error) {
+    }catch(error){
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER; // 500
     }
-};
+}
 
 
-//Função para inserir um novo ingrediente
+//Função para fazer o login do usuário
 const loginUsuario = async function (dadosLogin, contentType){
     try {
         if(contentType == 'application/json'){
-            if(dadosLogin.email == undefined || dadosLogin.email == null || dadosLogin.email == "" || 
-            dadosLogin. senha == undefined || dadosLogin.senha == null || dadosLogin.senha == ""){
+            if( dadosLogin.email  == undefined || dadosLogin.email == null || dadosLogin.email == "" || 
+                dadosLogin.senha  == undefined || dadosLogin.senha == null || dadosLogin.senha == ""
+            ){
                 return MESSAGE.ERROR_REQUIRED_FIELDS
             }else{
                 let JsonDadosLogin = {}
                 //encaminha os dados do novo sexo para ser inserido no banco de dados
                 let resultLogin = await usuarioDAO.loginUsuario(dadosLogin)
+
                 if(resultLogin != false || typeof(resultLogin) == 'object'){
                     if(resultLogin.length > 0){
     
                         JsonDadosLogin.status = true
                         JsonDadosLogin.status_code = 200
                         JsonDadosLogin.usuario = resultLogin
-
-                        console.log(JsonDadosLogin)
     
                         return JsonDadosLogin//200
                     }else{
@@ -258,9 +251,6 @@ const loginUsuario = async function (dadosLogin, contentType){
                 }else{
                     return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500
                 }
-
-
-                
             }
         }else{
             return MESSAGE.ERROR_CONTENT_TYPE

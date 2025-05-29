@@ -39,7 +39,6 @@ const insertUsuario = async function (usuario){
         if(result){
             let sqlSelect = `select * from tbl_usuario where nome_usuario = '${usuario.nome_usuario}' order by id desc limit 1`
             let criado = await prisma.$queryRawUnsafe(sqlSelect)
-            console.log(criado);
             
             return criado[0]
         }else{
@@ -65,10 +64,13 @@ const updateUsuario = async function (usuario){
         let result = await prisma.$executeRawUnsafe(sql)
 
         if(result){
-            return true
+            let sqlSelect = `select * from tbl_usuario where nome_usuario = '${usuario.nome_usuario}' order by id desc limit 1`
+            let criado = await prisma.$queryRawUnsafe(sqlSelect)
+            
+            return criado[0]
         }else{
             return false
-        }
+        } 
     }catch(error){
         return false   
     }
@@ -133,23 +135,22 @@ const selectByIdUsuario = async function (id){
 
 //Função para buscar no Banco de Dados um usuário pelo nome
 const selectByNomeUsuario = async function (nome){
-
     try {
-        let nomeUsuario = nome
-        let sql = `select * from tbl_usuario where nome_usuario = ${nomeUsuario}`
+        let sql = `SELECT * FROM tbl_usuario WHERE nome_usuario = '${nome}';
+`
+        const result = await prisma.$executeRawUnsafe(sql)
 
-        let result = await prisma.$queryRawUnsafe(sql)
-
-        if(result){
+        if (result) {
             return result
-        }else{
+        } else {
             return false
         }
-    }catch(error){
+    } catch (error) {
+        console.error(error) 
         return false
     }
-    
 }
+
 
 //Função para buscar no Banco de Dados um email
 const updatePassword = async function (dadosRecSenha){
@@ -169,7 +170,6 @@ const updatePassword = async function (dadosRecSenha){
             return false
         }
     }catch(error){
-        console.log(error)
         return false
     }
 }
@@ -207,7 +207,7 @@ const receberIdDoUsuario = async function () {
             return false
         }
     } catch (error) {
-        
+
         return false
     }
 }
