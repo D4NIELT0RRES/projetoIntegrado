@@ -65,7 +65,7 @@ app.post('/v1/controle-receita/usuario', cors(), bodyParserJson, async function 
     //Encaminha os dados do body da requisição para a controller inserir no banco de dados
     let resultUsuario = await controllerUsuario.inserirUsuario(dadosBody,contentType)
 
-    response.status(resultUsuario.status_code)
+    response.status(resultUsuario.status)
     response.json(resultUsuario)
 })
 
@@ -133,7 +133,6 @@ app.put('/v1/controle-receita/usuario', cors(), bodyParserJson, async function(r
     response.json(resultUsuario);
 });
 
-
 //Endpoint para trazer um usuario através do login 
 app.post('/v1/controle-receita/login', cors(), bodyParserJson, async function (request,response){
 
@@ -149,6 +148,8 @@ app.post('/v1/controle-receita/login', cors(), bodyParserJson, async function (r
     response.status(resultLogin.status_code)
     response.json(resultLogin)
 })
+
+
 
 app.listen('8080', function(){
     console.log('API aguardando Requisições...')

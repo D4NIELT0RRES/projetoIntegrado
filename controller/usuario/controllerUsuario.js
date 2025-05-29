@@ -20,19 +20,22 @@ const inserirUsuario = async function (usuario, contentType){
             if(usuario.nome_usuario     == undefined || usuario.nome_usuario       == '' || usuario.nome_usuario     == null || usuario.nome_usuario.length  > 50  ||
                usuario.email            == undefined || usuario.email              == '' || usuario.email            == null || usuario.email.length         > 100 ||
                usuario.senha            == undefined || usuario.senha              == '' || usuario.senha            == null || usuario.senha.length         > 12  ||
-               usuario.palavra_chave    == undefined || usuario.palavra_chave      == '' || usuario.palavra_chave    == null || usuario.palavra_chave.length > 25  ||
-               usuario.foto_perfil      == undefined || usuario.foto_perfil.length > 255 
-            ){
+               usuario.palavra_chave    == undefined || usuario.palavra_chave      == '' || usuario.palavra_chave    == null || usuario.palavra_chave.length > 25              ){
                 return MESSAGE.ERROR_REQUIRED_FIELDS//400
             }else{
                 //Encaminha os dados do novo usuário para ser inserida do Banco de Dados
                 let resultUsuario = await usuarioDAO.insertUsuario(usuario)
 
-                if(resultUsuario){
-                    return MESSAGE.SUCCESS_CREATED_ITEM //201
-                }else{
-                    return MESSAGE.ERROR_INTERNAL_SERVER_MODEL //500
+                if (resultUsuario) {
+                    return {
+                        status: 201,
+                        message: "Usuário criado com sucesso",
+                        usuario: resultUsuario
+                    }
+                } else {
+                    return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
                 }
+                
             }
         }else{
             return MESSAGE.ERROR_CONTENT_TYPE//415

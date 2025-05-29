@@ -37,12 +37,15 @@ const insertUsuario = async function (usuario){
         let result = await prisma.$executeRawUnsafe(sql)
 
         if(result){
-            return true
+            let sqlSelect = `select * from tbl_usuario where nome_usuario = '${usuario.nome_usuario}' order by id desc limit 1`
+            let criado = await prisma.$queryRawUnsafe(sqlSelect)
+            console.log(criado);
+            
+            return criado[0]
         }else{
             return false
         }       
-    }catch(error){
-        console.log(error);
+    }catch(error){        
         return false
     }
 }
@@ -148,8 +151,6 @@ const selectByNomeUsuario = async function (nome){
     
 }
 
-
-
 //Função para buscar no Banco de Dados um email
 const updatePassword = async function (dadosRecSenha){
 
@@ -193,6 +194,24 @@ const loginUsuario = async function (dadosLogin){
         return false   
     }
 }
+
+const receberIdDoUsuario = async function () {
+    try {
+        let sql = `SELECT * FROM tbl_usuario ORDER BY id DESC LIMIT 1;`
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result) {
+            console.log(result)
+            return true
+        } else {
+            return false
+        }
+    } catch (error) {
+        
+        return false
+    }
+}
+
 
 
 
