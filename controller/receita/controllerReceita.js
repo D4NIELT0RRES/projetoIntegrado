@@ -76,7 +76,7 @@ const atualizarReceita = async function(receita,id,contentType){
                         if(result){
                             return MESSAGE.SUCCESS_UPDATE_ITEM//200
                         }else{
-                            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500
+                            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//5
                         }
                     }else{
                         return MESSAGE.ERROR_NOT_FOUND//404

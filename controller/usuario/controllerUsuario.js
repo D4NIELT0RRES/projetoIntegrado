@@ -20,7 +20,7 @@ const inserirUsuario = async function (usuario, contentType){
             if(usuario.nome_usuario     == undefined || usuario.nome_usuario       == '' || usuario.nome_usuario     == null || usuario.nome_usuario.length  > 50  ||
                usuario.email            == undefined || usuario.email              == '' || usuario.email            == null || usuario.email.length         > 100 ||
                usuario.senha            == undefined || usuario.senha              == '' || usuario.senha            == null || usuario.senha.length         > 12  ||
-               usuario.palavra_chave    == undefined || usuario.palavra_chave      == '' || usuario.palavra_chave    == null || usuario.palavra_chave.length > 25              ){
+               usuario.palavra_chave    == undefined || usuario.palavra_chave      == '' || usuario.palavra_chave    == null || usuario.palavra_chave.length > 25  ){
                 return MESSAGE.ERROR_REQUIRED_FIELDS//400
             }else{
                 //Encaminha os dados do novo usuário para ser inserida do Banco de Dados

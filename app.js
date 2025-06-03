@@ -149,6 +149,7 @@ app.post('/v1/controle-receita/login', cors(), bodyParserJson, async function (r
     response.status(resultLogin.status_code)
     response.json(resultLogin)
 })
+
 /******************************************************************************************************************/
 
 //EndPoint para inserir uma receita no banco de dados 

@@ -45,7 +45,6 @@ const insertReceita = async function(receita){
     } catch(error){
         return false
     }
-    
 }
 
 //Função para atualizar no Banco de Dados uma receita existente
