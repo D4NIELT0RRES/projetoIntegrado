@@ -35,6 +35,7 @@ const bodyParser = require('body-parser')
 
 //Import das controllers para realizar o CRUD de dados
 const controllerUsuario = require('./controller/usuario/controllerUsuario.js')
+const controllerReceita = require('./controller/receita/controllerReceita.js')
 
 //Estabelecendo o formato de dados que deverá chegar no body da aquisição (POST ou PUT)
 const bodyParserJson = bodyParser.json()
@@ -148,7 +149,23 @@ app.post('/v1/controle-receita/login', cors(), bodyParserJson, async function (r
     response.status(resultLogin.status_code)
     response.json(resultLogin)
 })
+/******************************************************************************************************************/
 
+//EndPoint para inserir uma receita no banco de dados 
+app.post('/v1/controle-receita/receita', cors(), bodyParserJson, async function (request,response){
+
+    //Recebe o content type para validar o tipo de dados da requisição
+    let contentType = request.headers['content-type']
+
+    //Recebe o conteúdo do body da requisição
+    let dadosBody = request.body
+
+    //Encaminha os dados do body da requisição para a controller inserir no banco de dados
+    let resultReceita = await controllerReceita.inserirReceita(dadosBody,contentType)
+
+    response.status(resultReceita.status_code)
+    response.json(resultReceita)
+})
 
 
 app.listen('8080', function(){
