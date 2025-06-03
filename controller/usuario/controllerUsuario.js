@@ -118,7 +118,7 @@ const listarUsuario = async function(){
                 dadosUsuario.status = true
                 dadosUsuario.status_code = 200
                 dadosUsuario.items = resultUsuario.length
-                dadosUsuario.games = resultUsuario
+                dadosUsuario.usuario = resultUsuario
 
                 return dadosUsuario//20
             }else{
@@ -148,7 +148,7 @@ const buscarUsuario = async function (id){
 
                     dadosUsuario.status = true
                     dadosUsuario.status_code = 200
-                    dadosUsuario.games = resultUsuario
+                    dadosUsuario.usuario = resultUsuario
 
                     return dadosUsuario//200
                 }else{
@@ -178,7 +178,7 @@ const buscarUsuarioPorNome = async function(nome_usuario){
 
                     dadosUsuario.status = true
                     dadosUsuario.status_code = 200
-                    dadosUsuario.games = resultUsuario
+                    dadosUsuario.usuario = resultUsuario[0]
 
                     return dadosUsuario//200
                 }else{

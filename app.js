@@ -167,6 +167,52 @@ app.post('/v1/controle-receita/receita', cors(), bodyParserJson, async function 
     response.json(resultReceita)
 })
 
+//EndPoint para listar receita no banco de dados 
+app.get('/v1/controle-receita/receita', cors(), bodyParserJson, async function (request, response) {
+    
+    let resultReceita = await controllerReceita.listarReceita()
+
+    response.status(resultReceita.status_code)
+    response.json(resultReceita)
+})
+
+//EndPoint para retornar um usuário pelo ID
+app.get('/v1/controle-receita/receita/:id', cors(), async function (request,response) {
+    
+    let idReceita = request.params.id
+    let resultReceita = await controllerReceita.buscarReceita(idReceita)
+
+    response.status(resultReceita.status_code)
+    response.json(resultReceita)
+
+})
+
+//EndPoint para deletar uma receita pelo ID
+app.delete('/v1/controle-receita/receita/:id', cors(), async function (request,response) {
+    
+    let idReceita = request.params.id
+    let resultReceita = await controllerReceita.excluirReceita(idReceita)
+
+    response.status(resultReceita.status_code)
+    response.json(resultReceita)
+})
+
+//EndPoint para atualizar uma receita pelo ID
+app.put('/v1/controle-receita/receita/:id', cors(), bodyParserJson, async function (request,response){
+
+    let contentType = request.headers['content-type']
+    let idReceita = request.params.id
+    let dadosBody = request.body
+ 
+    let resultReceita = await controllerReceita.atualizarReceita(dadosBody,idReceita,contentType)
+ 
+    response.status(resultReceita.status_code)
+    response.json(resultReceita)
+     
+ })
+
+
+
 
 app.listen('8080', function(){
     console.log('API aguardando Requisições...')

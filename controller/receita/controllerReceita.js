@@ -20,11 +20,12 @@ const inserirReceita = async function(receita,contentType){
     try{
         if(contentType == 'application/json'){
 
-            if(receita.titulo        == undefined  ||  receita.titulo        == ''   || receita.titulo        == null   || receita.titulo.length > 100   || 
+            if(receita.titulo        == undefined  ||  receita.titulo        == ''   || receita.titulo        == null   || receita.titulo.length        > 100  || 
                receita.tempo_preparo == undefined  ||  receita.tempo_preparo == ''   || receita.tempo_preparo == null   || receita.tempo_preparo.length > 10   || 
-               receita.foto_receita  == undefined  ||  receita.foto_receita  == ''   || receita.foto_receita  == null   || receita.foto_receita.length > 255   || 
-               receita.descricao     == undefined  ||  receita.descricao     == ''   || receita.descricao     == null   || receita.descricao.length > 255   || 
+               receita.foto_receita  == undefined  ||  receita.foto_receita  == ''   || receita.foto_receita  == null   || receita.foto_receita.length  > 255  || 
+               receita.dificuldade   == undefined  ||  receita.dificuldade   == ''   || receita.dificuldade   == null   || receita.dificuldade.length   > 45   || 
                receita.modo_preparo  == undefined  ||  receita.modo_preparo  == ''   ||
+               receita.ingrediente   == undefined  ||  receita.modo_preparo  == ''   ||
                receita.id_usuario    == undefined  ||  receita.id_usuario    == ''   || receita.id_usuario    == null   || isNaN(receita.id_usuario) || receita.id_usuario <= 0 
             ){
                 return MESSAGE.ERROR_REQUIRED_FIELDS//400
@@ -51,13 +52,15 @@ const atualizarReceita = async function(receita,id,contentType){
     try{
        if(contentType == 'application/json'){
 
-            if(receita.titulo         == undefined  ||  receita.titulo        == ''   || receita.titulo        == null   || receita.titulo.length        > 100   || 
-                receita.tempo_preparo == undefined  ||  receita.tempo_preparo == ''   || receita.tempo_preparo == null   || receita.tempo_preparo.length > 10    || 
-                receita.foto_receita  == undefined  ||  receita.foto_receita  == ''   || receita.foto_receita  == null   || receita.foto_receita.length  > 255   || 
-                receita.descricao     == undefined  ||  receita.descricao     == ''   || receita.descricao     == null   || receita.descricao.length     > 255   || 
+            if( receita.titulo        == undefined  ||  receita.titulo        == ''   || receita.titulo        == null   || receita.titulo.length        > 100  || 
+                receita.tempo_preparo == undefined  ||  receita.tempo_preparo == ''   || receita.tempo_preparo == null   || receita.tempo_preparo.length > 10   || 
+                receita.foto_receita  == undefined  ||  receita.foto_receita  == ''   || receita.foto_receita  == null   || receita.foto_receita.length  > 255  || 
+                receita.dificuldade   == undefined  ||  receita.dificuldade   == ''   || receita.dificuldade   == null   || receita.dificuldade.length   > 45   || 
                 receita.modo_preparo  == undefined  ||  receita.modo_preparo  == ''   ||
+                receita.ingrediente   == undefined  ||  receita.modo_preparo  == ''   ||
                 id                    == undefined  ||  id                    == ''   || id                    == null   || isNaN(id)              || id<= 0      ||
-                receita.id_usuario    == undefined  ||  jogo.id_usuario       == ''   || jogo.id_usuario       == null   || isNaN(jogo.id_usuario) || jogo.id_usuario <= 0 
+                receita.id_usuario    == undefined  ||  receita.id_usuario    == ''   || receita.id_usuario    == null   || isNaN(receita.id_usuario) || receita.id_usuario <= 0 
+                
             ){
                 return MESSAGE.ERROR_REQUIRED_FIELDS//400
             }else{
@@ -120,44 +123,41 @@ const excluirReceita = async function(id){
 
 //Função para retornar todas as receitas
 const listarReceita = async function(){
-    
     try{
         const arrayReceitas = []
         let dadosReceitas = {}
-        
-        //Chama a função para retornar os dados da receita
+
         let resultReceita = await receitaDAO.selectAllReceita()
 
         if(resultReceita != false || typeof(resultReceita) == 'object'){
             if(resultReceita.length > 0){
 
-                dadosReceitas.status = true
-                dadosReceitas.status_code = 200
-                dadosReceitas.items = resultReceita.length
-                
-                for(itemReceita of resultReceita){
-
+                for (let itemReceita of resultReceita) {
                     let dadosUsuario = await controllerUsuario.buscarUsuario(itemReceita.id_usuario)
 
                     itemReceita.usuario = dadosUsuario.usuario
-
                     delete itemReceita.id_usuario
 
                     arrayReceitas.push(itemReceita)
                 }
-                dadosReceitas.receita
+
+                dadosReceitas.status = true
+                dadosReceitas.status_code = 200
+                dadosReceitas.items = arrayReceitas
+
                 return dadosReceitas
-            }else{
-                return MESSAGE.ERROR_NOT_FOUND//400
+            } else {
+                return MESSAGE.ERROR_NOT_FOUND
             }
-        }else{
-            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500
+        } else {
+            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
         }
 
-    }catch(error){
-        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER//500   
+    } catch (error) {
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER   
     }
 }
+
 
 const buscarReceita = async function(id){
     
@@ -168,16 +168,19 @@ const buscarReceita = async function(id){
             const arrayReceita = []
             const dadosReceita = {}
 
+            //Chama a função para retornar os dados da receita
             let resultReceita = await receitaDAO.selectByIdReceita(parseInt(id))
 
             if(resultReceita != false || typeof(resultReceita) == 'object'){
                 if(resultReceita.length > 0){
+
+                    //Cria um objeto do tipo JSON para retornar a lista de receitas
                     dadosReceita.status = true
                     dadosReceita.status_code = 200
                     for(itemUsuario of resultReceita){
                         let dadosUsuario = await controllerUsuario.buscarUsuario(itemUsuario.id_usuario)
                         itemUsuario.usuario = dadosUsuario.usuario
-                        delete itemUsuario.usuario
+                        delete itemUsuario.id_usuario 
 
                         arrayReceita.push(itemUsuario)
                     }
@@ -191,6 +194,7 @@ const buscarReceita = async function(id){
             }
         }
     }catch(error){
+        console.log(error)
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER//500
     }
 } 

@@ -15,21 +15,23 @@ const prisma = new PrismaClient()
 const insertReceita = async function(receita){
 
     try {
-        let sql = `insert into tbl_receita  (
-                                                titulo,
-                                                tempo_preparo,
-                                                foto_receita,
-                                                descricao,
-                                                modo_preparo,
-                                                id_usuario
-                                            ) values (
-                                                '${receita.titulo}',
-                                                '${receita.tempo_preparo}',
-                                                '${receita.foto_receita}',
-                                                '${receita.descricao}',
-                                                '${receita.modo_preparo}',
-                                                ${receita.id_usuario}
-                                           ):`
+        let sql = `insert into tbl_receita(
+                                            titulo,
+                                            tempo_preparo,
+                                            foto_receita,
+                                            ingrediente,
+                                            modo_preparo,
+                                            dificuldade,
+                                            id_usuario
+                                          ) values (
+                                            '${receita.titulo}',
+                                            '${receita.tempo_preparo}',
+                                            '${receita.foto_receita}',
+                                            '${receita.ingrediente}',
+                                            '${receita.modo_preparo}',
+                                            '${receita.dificuldade}',
+                                             ${receita.id_usuario}
+                                           );`
         //Executa o script SQL no BD e aguarda o retorno no BD
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -54,8 +56,9 @@ const updateReceita = async function(receita){
        let sql = `update tbl_receita set        titulo        = '${receita.titulo}',
                                                 tempo_preparo = '${receita.tempo_preparo}',
                                                 foto_receita  = '${receita.foto_receita}',
-                                                descricao     = '${receita.descricao}',
+                                                ingrediente   = '${receita.ingrediente}',
                                                 modo_preparo  = '${receita.modo_preparo}',
+                                                dificuldade   = '${receita.dificuldade}',
                                                 id_usuario    = '${receita.id_usuario}'
                                                 where id = ${receita.id}`
         //Executa o script SQL no BD e aguarda o retorno no BD
@@ -107,6 +110,7 @@ const selectAllReceita = async function(){
             return false
         }
     }catch(error){
+        console.log(error);
         return false
     }
 }
