@@ -58,7 +58,7 @@ const atualizarReceita = async function(receita,id,contentType){
                 receita.dificuldade   == undefined  ||  receita.dificuldade   == ''   || receita.dificuldade   == null   || receita.dificuldade.length   > 45   || 
                 receita.modo_preparo  == undefined  ||  receita.modo_preparo  == ''   ||
                 receita.ingrediente   == undefined  ||  receita.modo_preparo  == ''   ||
-                id                    == undefined  ||  id                    == ''   || id                    == null   || isNaN(id)              || id<= 0      ||
+                id                    == undefined  ||  id                    == ''   || id                    == null   || isNaN(id)                 || id<= 0      ||
                 receita.id_usuario    == undefined  ||  receita.id_usuario    == ''   || receita.id_usuario    == null   || isNaN(receita.id_usuario) || receita.id_usuario <= 0 
                 
             ){
@@ -76,7 +76,7 @@ const atualizarReceita = async function(receita,id,contentType){
                         if(result){
                             return MESSAGE.SUCCESS_UPDATE_ITEM//200
                         }else{
-                            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//5--
+                            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500
                         }
                     }else{
                         return MESSAGE.ERROR_NOT_FOUND//404

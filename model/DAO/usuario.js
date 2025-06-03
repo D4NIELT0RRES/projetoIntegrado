@@ -135,10 +135,12 @@ const selectByIdUsuario = async function (id){
 
 //Função para buscar no Banco de Dados um usuário pelo nome
 const selectByNomeUsuario = async function (nome){
+
     try {
-        let sql = `SELECT * FROM tbl_usuario WHERE nome_usuario = '${nome}';
-`
-        const result = await prisma.$executeRawUnsafe(sql)
+        let nomeUsuario = nome
+        let sql = `SELECT * FROM tbl_usuario WHERE nome_usuario = ${nomeUsuario};`
+        
+        const result = await prisma.$queryRawUnsafe(sql)
 
         if (result) {
             return result
