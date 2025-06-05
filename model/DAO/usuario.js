@@ -44,7 +44,9 @@ const insertUsuario = async function (usuario){
         }else{
             return false
         }       
-    }catch(error){        
+    }catch(error){      
+        console.log(error);
+          
         return false
     }
 }

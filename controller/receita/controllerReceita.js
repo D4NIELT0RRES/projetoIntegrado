@@ -26,28 +26,29 @@ const inserirReceita = async function(receita, contentType){
                 receita.dificuldade   == undefined || receita.dificuldade   == '' || receita.dificuldade   == null || receita.dificuldade.length   > 45  ||
                 receita.modo_preparo  == undefined || receita.modo_preparo  == '' ||
                 receita.ingrediente   == undefined || receita.ingrediente   == '' ||
-                receita.id_usuario    == undefined || receita.id_usuario    == '' || receita.id_usuario    == null || isNaN(receita.id_usuario) || receita.id_usuario <= 0
-            ) {
-                return MESSAGE.ERROR_REQUIRED_FIELDS // 400
-            } else {
-                let resultReceita = await receitaDAO.insertReceita(receita)
-
-                if (resultReceita) {
-                    return MESSAGE.SUCCESS_CREATED_ITEM
-                } else {
-                    return MESSAGE.ERROR_INTERNAL_SERVER_MODEL // 500
+                receita.id_usuario    == undefined || receita.id_usuario    == '' || receita.id_usuario    == null || isNaN(receita.id_usuario) || receita.id_usuario <= 0 ){
+                    return MESSAGE.ERROR_REQUIRED_FIELDS//400
+                }else{
+                    //Encaminha os dados da nova receita para ser inserida do Banco de Dados
+                    let resultReceita = await receitaDAO.insertReceita(receita)
+    
+                    if (resultReceita) {
+                        return {
+                            status_code: 201,
+                            message: "Receita criada com sucesso",
+                            receita: resultReceita
+                        }
+                    } else {
+                        return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
+                    }
                 }
+            }else{
+                return MESSAGE.ERROR_CONTENT_TYPE//415
             }
-        } else {
-            return MESSAGE.ERROR_CONTENT_TYPE // 415
+        }catch(error){
+            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500   
         }
-    } catch (error) {
-        console.log(error);
-        
-        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
-}
-
 
 //Função para atualizar uma receita
 const atualizarReceita = async function(receita,id,contentType){
