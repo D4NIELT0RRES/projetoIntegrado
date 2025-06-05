@@ -82,7 +82,7 @@ const selectAllClassificacao = async function(){
     
     try{
         //Script SQL para retornar os dados do BD
-        let sql = `select * from tbl_receita`
+        let sql = `select * from tbl_classificacao order by id desc`
 
         //Executa o script SQL e aguarda o retorno dos dados
         let result = await prisma.$queryRawUnsafe(sql)
@@ -99,11 +99,11 @@ const selectAllClassificacao = async function(){
 }
 
 //Função para buscar no Banco de Dados um jogo pelo ID
-const selectByIdReceita = async function(id){
+const selectByIdClassificacao  = async function(id){
     
     try{
        let idReceita = id
-       let sql = `select * from tbl_receita where id=${idReceita}`
+        let sql = `select * from tbl_classificacao where id = ${id}`
        
        let result = await prisma.$queryRawUnsafe(sql)
 
@@ -117,31 +117,24 @@ const selectByIdReceita = async function(id){
     }
 }
 
-//Função para buscar no Banco de Dados um jogo pelo Título
-const selectByTitleReceita = async function(id){
-    
-    try{
-       let idReceita = id
-       let sql = `select * from tbl_receita where titulo=${titulo}`
-       
-       let result = await prisma.$queryRawUnsafe(sql)
-
-        if(result){
+//Função para buscar uma classificacao no banco de dados com base no seu nome
+const selectByNameClassificacao = async function(nome){
+    try {
+        let sql = `select * from tbl_classificacao where nome = ${nome}`
+        let result = await prisma.$queryRawUnsafe(sql)
+        if(result)
             return result
-        }else{
+        else 
             return false
-        }
-    }catch(error){
+    } catch (error) {
         return false
     }
 }
 
 module.exports = {
-    insertReceita,
-    updateReceita,
-    deleteReceita,
-    selectAllReceita,
-    selectByIdReceita,
-    selectByTitleReceita
+    insertClassificacao,
+    updateClassificacao,
+    deleteClassificacao,
+    selectAllClassificacao
 }
 
