@@ -15,8 +15,7 @@ const prisma = new PrismaClient()
 const insertReceita = async function(receita){
 
     try {
-        let sql = `insert into tbl_receita(
-                                            titulo,
+        let sql = `insert into tbl_receita(titulo,
                                             tempo_preparo,
                                             foto_receita,
                                             ingrediente,
@@ -42,7 +41,7 @@ const insertReceita = async function(receita){
         }else{
             return false
         }
-    } catch(error){        
+    } catch(error){    
         return false
     }
 }

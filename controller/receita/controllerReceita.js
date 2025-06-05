@@ -15,40 +15,38 @@ const receitaDAO = require('../../model/DAO/receita.js')
 const controllerUsuario = require('../usuario/controllerUsuario.js')
 
 //Função para inserir uma nova receita
-const inserirReceita = async function(receita, contentType){
+const inserirReceita = async function(receita,contentType){
 
-    try {
-        if (contentType.includes('application/json') || contentType.includes('multipart/form-data')) {
+    try{
+        
+        if(contentType == 'application/json'){
 
-            if (receita.titulo        == undefined || receita.titulo        == '' || receita.titulo        == null || receita.titulo.length        > 100 ||
+            if( 
+                receita.titulo        == undefined || receita.titulo        == '' || receita.titulo        == null || receita.titulo.length        > 100 ||
                 receita.tempo_preparo == undefined || receita.tempo_preparo == '' || receita.tempo_preparo == null || receita.tempo_preparo.length > 10  ||
                 receita.foto_receita  == undefined || receita.foto_receita  == '' || receita.foto_receita  == null || receita.foto_receita.length  > 255 ||
-                receita.dificuldade   == undefined || receita.dificuldade   == '' || receita.dificuldade   == null || receita.dificuldade.length   > 45  ||
-                receita.modo_preparo  == undefined || receita.modo_preparo  == '' ||
                 receita.ingrediente   == undefined || receita.ingrediente   == '' ||
-                receita.id_usuario    == undefined || receita.id_usuario    == '' || receita.id_usuario    == null || isNaN(receita.id_usuario) || receita.id_usuario <= 0 ){
-                    return MESSAGE.ERROR_REQUIRED_FIELDS//400
-                }else{
-                    //Encaminha os dados da nova receita para ser inserida do Banco de Dados
-                    let resultReceita = await receitaDAO.insertReceita(receita)
-    
-                    if (resultReceita) {
-                        return {
-                            status_code: 201,
-                            message: "Receita criada com sucesso",
-                            receita: resultReceita
-                        }
-                    } else {
-                        return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
-                    }
-                }
+                receita.modo_preparo  == undefined || receita.modo_preparo  == '' ||
+                receita.dificuldade   == undefined || receita.dificuldade   == '' || receita.dificuldade   == null || receita.dificuldade.length   > 45  ||
+                receita.id_usuario    == undefined || receita.id_usuario    == '' || receita.id_usuario    == null || receita.id_usuario <= 0
+            ){
+                return MESSAGE.ERROR_REQUIRED_FIELDS//400
             }else{
-                return MESSAGE.ERROR_CONTENT_TYPE//415
+                let resultReceita = await receitaDAO.insertReceita(receita)
+
+                if(resultReceita){
+                    return MESSAGE.SUCCESS_CREATED_ITEM
+                }else{
+                    return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500
+                }
             }
-        }catch(error){
-            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500   
+        }else{
+            return MESSAGE.ERROR_CONTENT_TYPE//415
         }
+    }catch(error){      
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER//500
     }
+}
 
 //Função para atualizar uma receita
 const atualizarReceita = async function(receita,id,contentType){
@@ -61,7 +59,7 @@ const atualizarReceita = async function(receita,id,contentType){
                 receita.foto_receita  == undefined  ||  receita.foto_receita  == ''   || receita.foto_receita  == null   || receita.foto_receita.length  > 255  || 
                 receita.dificuldade   == undefined  ||  receita.dificuldade   == ''   || receita.dificuldade   == null   || receita.dificuldade.length   > 45   || 
                 receita.modo_preparo  == undefined  ||  receita.modo_preparo  == ''   ||
-                receita.ingrediente   == undefined  ||  receita.modo_preparo  == ''   ||
+                receita.ingrediente   == undefined  ||  receita.ingrediente   == ''   ||
                 id                    == undefined  ||  id                    == ''   || id                    == null   || isNaN(id)                 || id<= 0      ||
                 receita.id_usuario    == undefined  ||  receita.id_usuario    == ''   || receita.id_usuario    == null   || isNaN(receita.id_usuario) || receita.id_usuario <= 0 
                 

@@ -142,7 +142,12 @@ VALUES
 (1, 2), 
 (1, 3); 
 */
--- Consulta para verificar os relacionamentos
+
+insert into tbl_classificacao(nome) values ('Salgado');
+
+update tbl_classificacao set  nome = 'Doce' where id = 1;
+
+delete from tbl_classificacao where id= 1;
 SELECT 
     r.titulo AS receita,
     c.nome AS classificacao

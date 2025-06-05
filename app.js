@@ -33,32 +33,10 @@ const express    = require('express')
 const cors       = require('cors')
 const bodyParser = require('body-parser')
 
-// ⬇️ Importação do multer e configuração do upload de imagens
-const multer = require('multer')
-const path = require('path')
-
-// Configuração do multer para usar a pasta 'uploads' na raiz do projeto
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './uploads') // Caminho relativo à raiz do projeto
-    },
-    filename: function (req, file, cb) {
-        const nomeArquivo = Date.now() + path.extname(file.originalname)
-        cb(null, nomeArquivo)
-    }
-})
-
-const upload = multer({ storage: storage })
-
-module.exports = upload
-
-
-// Seus controllers e demais configurações seguem normalmente abaixo...
-
-
 //Import das controllers para realizar o CRUD de dados
-const controllerUsuario = require('./controller/usuario/controllerUsuario.js')
-const controllerReceita = require('./controller/receita/controllerReceita.js')
+const controllerUsuario      = require('./controller/usuario/controllerUsuario.js')
+const controllerReceita      = require('./controller/receita/controllerReceita.js')
+const controllerClassificacao = require('./controller/classificacao/controllerClassificacao.js')
 
 //Estabelecendo o formato de dados que deverá chegar no body da aquisição (POST ou PUT)
 const bodyParserJson = bodyParser.json()
@@ -72,6 +50,7 @@ app.use((request, response, next) =>{
     response.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
 
     app.use(cors())
+    app.use(express.json())
     next()
 })
 
@@ -175,28 +154,21 @@ app.post('/v1/controle-receita/login', cors(), bodyParserJson, async function (r
 /******************************************************************************************************************/
 
 // Endpoint para inserir uma receita com foto_receita
-app.post('/v1/controle-receita/receita', cors(), upload.single('foto_receita'), async function (request, response) {
+app.post('/v1/controle-receita/receita', cors(), bodyParserJson, async function (request, response) {
 
-    // Recebe o arquivo enviado no campo 'foto_receita'
-    let imagem = request.file;
-
-    // Recebe o content-type da requisição (normalmente multipart/form-data)
+    // Recebe o content-type da requisição (application/json, por exemplo)
     let contentType = request.headers['content-type'];
 
-    // Recebe os demais dados do body (campos de texto do form-data)
+    // Recebe os dados do body (campos de texto, incluindo a URL da imagem)
     let dadosBody = request.body;
 
-    // Se a imagem foi enviada, adiciona o nome do arquivo no objeto de dados da receita
-    if (imagem) {
-        dadosBody.foto_receita = imagem.filename;  // mantenha o mesmo nome que sua controller espera
-    }
-
-    // Chama a controller para inserir a receita com os dados atualizados
+    // Chama a controller para inserir a receita com os dados recebidos
     let resultReceita = await controllerReceita.inserirReceita(dadosBody, contentType);
 
     response.status(resultReceita.status_code);
     response.json(resultReceita);
 });
+
 
 
 //EndPoint para listar receita no banco de dados 
@@ -243,6 +215,77 @@ app.put('/v1/controle-receita/receita/:id', cors(), bodyParserJson, async functi
      
 })
 
+/******************************************************************************************************************/
+
+//EndPoint para inserir uma classificacao no banco de dados 
+app.post('/v1/controle-receita/classificacao', cors(), bodyParserJson, async function (request,response){
+
+    //Recebe o content type para validar o tipo de dados da requisição
+    let contentType = request.headers['content-type']
+
+    //Recebe o conteúdo do body da requisição
+    let dadosBody = request.body
+
+    //Encaminha os dados do body da requisição para a controller inserir no banco de dados
+    let resultClassificacao = await controllerClassificacao.inserirClassificacao(dadosBody,contentType)
+
+    response.status(resultClassificacao.status_code)
+    response.json(resultClassificacao)
+})
+
+//EndPoint para listar classificacao no banco de dados 
+app.get('/v1/controle-receita/classificacao', cors(), bodyParserJson, async function (request, response) {
+    
+    let resultClassificacao = await controllerClassificacao.listarClassificacao()
+
+    response.status(resultClassificacao.status_code)
+    response.json(resultClassificacao)
+})
+
+//EndPoint para retornar uma classificacao pelo ID
+app.get('/v1/controle-receita/classificacao/:id', cors(), async function (request,response) {
+    
+    let idClassificacao = request.params.id
+    let resultClassificacao = await controllerClassificacao.buscarClassificacao(idClassificacao)
+
+    response.status(resultClassificacao.status_code)
+    response.json(resultClassificacao)
+
+})
+
+//EndPoint para retornar uma classficacao pelo NOME
+app.get('/v1/controle-receita/classificacao/:nome', cors(), async function (request,response){
+
+    let nomeClassificacao = request.params.nome
+    let resultClassificacao = await controllerClassificacao.buscarClassificacao(nomeClassificacao)
+
+    response.status(resultClassificacao.status_code)
+    response.json(resultClassificacao)
+})
+
+//EndPoint para deletar uma classificacao pelo ID
+app.delete('/v1/controle-receita/classificacao/:id', cors(), async function (request,response) {
+    
+    let idClassificacao = request.params.id
+    let resultClassificacao = await controllerClassificacao.excluirClassificacao(idClassificacao)
+
+    response.status(resultClassificacao.status_code)
+    response.json(resultClassificacao)
+})
+
+//EndPoint para atualizar uma classificacao pelo ID
+app.put('/v1/controle-receita/classificacao/:id', cors(), bodyParserJson, async function (request,response){
+
+   let contentType = request.headers['content-type']
+   let idUsuario = request.params.id
+   let dadosBody = request.body
+
+   let resultClassificacao = await controllerClassificacao.atualizarClassificacao(dadosBody,idUsuario,contentType)
+
+   response.status(resultClassificacao.status_code)
+   response.json(resultClassificacao)
+    
+})
 
 
 app.listen('8080', function(){

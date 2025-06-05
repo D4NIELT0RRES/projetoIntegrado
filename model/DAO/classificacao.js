@@ -32,7 +32,7 @@ const insertClassificacao = async function(classificacao){
         }else{
             return false
         }
-    } catch(error){        
+    } catch(error){
         return false
     }
 }
@@ -93,7 +93,6 @@ const selectAllClassificacao = async function(){
             return false
         }
     }catch(error){
-        console.log(error);
         return false
     }
 }
@@ -103,7 +102,7 @@ const selectByIdClassificacao  = async function(id){
     
     try{
        let idReceita = id
-        let sql = `select * from tbl_classificacao where id = ${id}`
+        let sql = `select * from tbl_classificacao where id = ${idReceita}`
        
        let result = await prisma.$queryRawUnsafe(sql)
 
@@ -135,6 +134,8 @@ module.exports = {
     insertClassificacao,
     updateClassificacao,
     deleteClassificacao,
-    selectAllClassificacao
+    selectAllClassificacao,
+    selectByIdClassificacao,
+    selectByNameClassificacao
 }
 
