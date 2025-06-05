@@ -13,9 +13,7 @@ CREATE TABLE tbl_usuario (
     senha VARCHAR(13) NOT NULL,
     palavra_chave VARCHAR(25) NOT NULL,
     foto_perfil VARCHAR(255),
-      -- define a data/hora atual automaticamente
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      -- atualiza automaticamente quando o registro é modificado
     data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 -- Trigger para padronização de dados

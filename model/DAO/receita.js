@@ -42,7 +42,7 @@ const insertReceita = async function(receita){
         }else{
             return false
         }
-    } catch(error){
+    } catch(error){        
         return false
     }
 }

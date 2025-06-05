@@ -33,6 +33,29 @@ const express    = require('express')
 const cors       = require('cors')
 const bodyParser = require('body-parser')
 
+// ⬇️ Importação do multer e configuração do upload de imagens
+const multer = require('multer')
+const path = require('path')
+
+// Configuração do multer para usar a pasta 'uploads' na raiz do projeto
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads') // Caminho relativo à raiz do projeto
+    },
+    filename: function (req, file, cb) {
+        const nomeArquivo = Date.now() + path.extname(file.originalname)
+        cb(null, nomeArquivo)
+    }
+})
+
+const upload = multer({ storage: storage })
+
+module.exports = upload
+
+
+// Seus controllers e demais configurações seguem normalmente abaixo...
+
+
 //Import das controllers para realizar o CRUD de dados
 const controllerUsuario = require('./controller/usuario/controllerUsuario.js')
 const controllerReceita = require('./controller/receita/controllerReceita.js')
@@ -145,28 +168,36 @@ app.post('/v1/controle-receita/login', cors(), bodyParserJson, async function (r
 
     //Encaminha os dados do body da requisição para a controller inserir no banco de dados
     let resultLogin = await controllerUsuario.loginUsuario(dadosBody,contentType)
-    console.log(resultLogin)
     response.status(resultLogin.status_code)
     response.json(resultLogin)
 })
 
 /******************************************************************************************************************/
 
-//EndPoint para inserir uma receita no banco de dados 
-app.post('/v1/controle-receita/receita', cors(), bodyParserJson, async function (request,response){
+// Endpoint para inserir uma receita com foto_receita
+app.post('/v1/controle-receita/receita', cors(), upload.single('foto_receita'), async function (request, response) {
 
-    //Recebe o content type para validar o tipo de dados da requisição
-    let contentType = request.headers['content-type']
+    // Recebe o arquivo enviado no campo 'foto_receita'
+    let imagem = request.file;
 
-    //Recebe o conteúdo do body da requisição
-    let dadosBody = request.body
+    // Recebe o content-type da requisição (normalmente multipart/form-data)
+    let contentType = request.headers['content-type'];
 
-    //Encaminha os dados do body da requisição para a controller inserir no banco de dados
-    let resultReceita = await controllerReceita.inserirReceita(dadosBody,contentType)
+    // Recebe os demais dados do body (campos de texto do form-data)
+    let dadosBody = request.body;
 
-    response.status(resultReceita.status_code)
-    response.json(resultReceita)
-})
+    // Se a imagem foi enviada, adiciona o nome do arquivo no objeto de dados da receita
+    if (imagem) {
+        dadosBody.foto_receita = imagem.filename;  // mantenha o mesmo nome que sua controller espera
+    }
+
+    // Chama a controller para inserir a receita com os dados atualizados
+    let resultReceita = await controllerReceita.inserirReceita(dadosBody, contentType);
+
+    response.status(resultReceita.status_code);
+    response.json(resultReceita);
+});
+
 
 //EndPoint para listar receita no banco de dados 
 app.get('/v1/controle-receita/receita', cors(), bodyParserJson, async function (request, response) {
@@ -210,8 +241,7 @@ app.put('/v1/controle-receita/receita/:id', cors(), bodyParserJson, async functi
     response.status(resultReceita.status_code)
     response.json(resultReceita)
      
- })
-
+})
 
 
 
