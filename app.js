@@ -153,14 +153,14 @@ app.post('/v1/controle-receita/login', cors(), bodyParserJson, async function (r
 
 /******************************************************************************************************************/
 
-// Endpoint para inserir uma receita com foto_receita
+// Endpoint para inserir uma receita
 app.post('/v1/controle-receita/receita', cors(), bodyParserJson, async function (request, response) {
 
     // Recebe o content-type da requisição (application/json, por exemplo)
     let contentType = request.headers['content-type'];
 
     // Recebe os dados do body (campos de texto, incluindo a URL da imagem)
-    let dadosBody = request.body;
+    let dadosBody = request.body
 
     // Chama a controller para inserir a receita com os dados recebidos
     let resultReceita = await controllerReceita.inserirReceita(dadosBody, contentType);

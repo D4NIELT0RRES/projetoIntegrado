@@ -72,7 +72,7 @@ const deleteClassificacao = async function(id){
             return false
         }
 
-    }catch(error){
+    }catch(error){        
         return false
     }
 }
