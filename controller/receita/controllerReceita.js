@@ -198,39 +198,39 @@ const buscarReceita = async function(id){
             //Chama a função para retornar os dados da receita
             let resultReceita = await receitaDAO.selectByIdReceita(parseInt(id))
 
-            if(resultReceita != false && typeof(resultReceita) == 'object'){
-            if(resultReceita.length > 0){
-                dadosReceitas.status = true
-                dadosReceitas.status_code = 200
-                dadosReceitas.items = arrayReceitas
+                if(resultReceita != false && typeof(resultReceita) == 'object'){
+                    if(resultReceita.length > 0){
+                        dadosReceitas.status = true
+                        dadosReceitas.status_code = 200
+                        dadosReceitas.items = arrayReceitas
 
-                for (let itemReceita of resultReceita) {
-                    // Buscar o usuário e associar
-                    let dadosUsuario = await controllerUsuario.buscarUsuario(itemReceita.id_usuario)
-                    itemReceita.usuario = dadosUsuario.usuario
-                    delete itemReceita.id_usuario
+                        for (let itemReceita of resultReceita) {
+                            // Buscar o usuário e associar
+                            let dadosUsuario = await controllerUsuario.buscarUsuario(itemReceita.id_usuario)
+                            itemReceita.usuario = dadosUsuario.usuario
+                            delete itemReceita.id_usuario
 
-                    // Buscar classificações da receita pelo id da receita
-                    let dadosClassificacao = await controllerReceitaClassificacao.buscarClassificacaoPorReceita(itemReceita.id)
+                            // Buscar classificações da receita pelo id da receita
+                            let dadosClassificacao = await controllerReceitaClassificacao.buscarClassificacaoPorReceita(itemReceita.id)
 
-                    if (dadosClassificacao.status) {
-                        itemReceita.classificacoes = dadosClassificacao.classificacao
+                            if (dadosClassificacao.status) {
+                                itemReceita.classificacoes = dadosClassificacao.classificacao
+                            } else {
+                                itemReceita.classificacoes = []
+                            }
+
+                            arrayReceitas.push(itemReceita)
+                        }
+                        return dadosReceitas
                     } else {
-                        itemReceita.classificacoes = []
-                    }
-
-                    arrayReceitas.push(itemReceita)
+                    return MESSAGE.ERROR_NOT_FOUND
                 }
-                return dadosReceitas
             } else {
-                return MESSAGE.ERROR_NOT_FOUND
+                return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
             }
-        } else {
-            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
-        }
-        }
+            }
     }catch(error){
-        console.log(error)
+
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER//500
     }
 } 
@@ -273,12 +273,10 @@ const listarReceitaByUsername = async function(userName) {
                 return MESSAGE.ERROR_NOT_FOUND
             }
         } else {
-            console.log(resultReceita)
             return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
         }
 
     } catch (error) {
-        console.log(error);
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER   
     }
 }

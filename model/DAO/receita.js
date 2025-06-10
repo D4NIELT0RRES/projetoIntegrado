@@ -113,14 +113,17 @@ const selectAllReceita = async function(){
     }
 }
 
-//Função para buscar no Banco de Dados um jogo pelo ID
+//Função para buscar no Banco de Dados uma receita pelo ID
 const selectByIdReceita = async function(id){
     
     try{
        let idReceita = id
-       let sql = `select * from tbl_receita where id=${idReceita}`
+
+       let sql = `select * from tbl_receita where id = ${idReceita}`
        
        let result = await prisma.$queryRawUnsafe(sql)
+
+
 
         if(result){
             return result
@@ -128,28 +131,14 @@ const selectByIdReceita = async function(id){
             return false
         }
     }catch(error){
+
         return false
     }
 }
 
-//Função para buscar no Banco de Dados um jogo pelo Título
-const selectByTitleReceita = async function(id){
-    
-    try{
-       let idReceita = id
-       let sql = `select * from tbl_receita where titulo=${titulo}`
-       
-       let result = await prisma.$queryRawUnsafe(sql)
 
-        if(result){
-            return result
-        }else{
-            return false
-        }
-    }catch(error){
-        return false
-    }
-}
+
+
 
 //Função para buscar no Banco de Dados uma receita pelo nome do usuario
 const selectByUserName = async function(userName){
@@ -162,11 +151,8 @@ const selectByUserName = async function(userName){
        WHERE u.nome_usuario = '${nomeUsuario}';`
        
        let result = await prisma.$queryRawUnsafe(sql)
-       console.log("Buscando receitas do usuário:", nomeUsuario);
-       console.log("Query executada:", sql);
+ 
 
-
-       console.log(result);
         if(result){
             return result
             
@@ -175,7 +161,6 @@ const selectByUserName = async function(userName){
             
         }
     }catch(error){
-        console.log(error);
         return false
     }
 }
@@ -186,7 +171,6 @@ module.exports = {
     deleteReceita,
     selectAllReceita,
     selectByIdReceita,
-    selectByTitleReceita,
     selectByUserName
 }
 

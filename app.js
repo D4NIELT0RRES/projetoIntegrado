@@ -191,8 +191,8 @@ app.get('/v1/controle-receita/receita/:username', cors(), async function (reques
 
 })
 
-//EndPoint para retornar um usuário pelo ID
-app.get('/v1/controle-receita/receita/:id', cors(), async function (request,response) {
+//EndPoint para retornar uma receita pelo ID
+app.get('/v1/controle-receita/receitaid/:id', cors(), async function (request,response) {
     
     let idReceita = request.params.id
     let resultReceita = await controllerReceita.buscarReceita(idReceita)
