@@ -151,12 +151,42 @@ const selectByTitleReceita = async function(id){
     }
 }
 
+//Função para buscar no Banco de Dados uma receita pelo nome do usuario
+const selectByUserName = async function(userName){
+    
+    try{
+        let nomeUsuario = userName
+       let sql = `    SELECT r.*
+       FROM tbl_receita r
+       JOIN tbl_usuario u ON r.id_usuario = u.id
+       WHERE u.nome_usuario = '${nomeUsuario}';`
+       
+       let result = await prisma.$queryRawUnsafe(sql)
+       console.log("Buscando receitas do usuário:", nomeUsuario);
+       console.log("Query executada:", sql);
+
+
+       console.log(result);
+        if(result){
+            return result
+            
+        }else{
+            return false
+            
+        }
+    }catch(error){
+        console.log(error);
+        return false
+    }
+}
+
 module.exports = {
     insertReceita,
     updateReceita,
     deleteReceita,
     selectAllReceita,
     selectByIdReceita,
-    selectByTitleReceita
+    selectByTitleReceita,
+    selectByUserName
 }
 

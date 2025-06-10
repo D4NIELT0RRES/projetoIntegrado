@@ -61,7 +61,6 @@ const inserirReceita = async function(receita, contentType) {
             return MESSAGE.ERROR_CONTENT_TYPE // 415
         }
     } catch (error) {
-        console.log(error)
         return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER // 500
     }
 }
@@ -236,10 +235,59 @@ const buscarReceita = async function(id){
     }
 } 
 
+//Função para retornar todas as receitas com base no nome de um usuário
+const listarReceitaByUsername = async function(userName) {
+    try {
+        const arrayReceitas = []
+        let dadosReceitas = {}
+
+        let resultReceita = await receitaDAO.selectByUserName(userName) // ← certo
+
+
+        if(resultReceita != false && typeof(resultReceita) == 'object'){
+            if(resultReceita.length > 0){
+                dadosReceitas.status = true
+                dadosReceitas.status_code = 200
+                dadosReceitas.items = arrayReceitas
+
+                for (let itemReceita of resultReceita) {
+                    // Buscar o usuário e associar
+                    let dadosUsuario = await controllerUsuario.buscarUsuario(itemReceita.id_usuario)
+                    itemReceita.usuario = dadosUsuario.usuario
+                    delete itemReceita.id_usuario
+
+                    // Buscar classificações da receita pelo id da receita
+                    let dadosClassificacao = await controllerReceitaClassificacao.buscarClassificacaoPorReceita(itemReceita.id)
+
+                    if (dadosClassificacao.status) {
+                        itemReceita.classificacoes = dadosClassificacao.classificacao
+                    } else {
+                        itemReceita.classificacoes = []
+                    }
+
+                    arrayReceitas.push(itemReceita)
+                }
+
+                return dadosReceitas
+            } else {
+                return MESSAGE.ERROR_NOT_FOUND
+            }
+        } else {
+            console.log(resultReceita)
+            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
+        }
+
+    } catch (error) {
+        console.log(error);
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER   
+    }
+}
+
 module.exports = {
     inserirReceita,
     atualizarReceita,
     excluirReceita,
     listarReceita,
-    buscarReceita   
+    buscarReceita,
+    listarReceitaByUsername
 }

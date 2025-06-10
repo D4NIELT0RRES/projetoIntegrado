@@ -180,6 +180,17 @@ app.get('/v1/controle-receita/receita', cors(), bodyParserJson, async function (
     response.json(resultReceita)
 })
 
+//EndPoint para retornar uma receita com base no nome de usuário
+app.get('/v1/controle-receita/receita/:username', cors(), async function (request,response) {
+    
+    let userName = request.params.username
+    let resultReceita = await controllerReceita.listarReceitaByUsername(userName)
+
+    response.status(resultReceita.status_code)
+    response.json(resultReceita)
+
+})
+
 //EndPoint para retornar um usuário pelo ID
 app.get('/v1/controle-receita/receita/:id', cors(), async function (request,response) {
     
