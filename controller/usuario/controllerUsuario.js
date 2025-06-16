@@ -225,38 +225,36 @@ const atualizarSenha = async function(dadosRecSenha) {
 
 
 //Função para fazer o login do usuário
-const loginUsuario = async function (dadosLogin, contentType){
+const loginUsuario = async function (dadosLogin, contentType) {
     try {
-        if(contentType == 'application/json'){
-            if( dadosLogin.email  == undefined || dadosLogin.email == null || dadosLogin.email == "" || 
-                dadosLogin.senha  == undefined || dadosLogin.senha == null || dadosLogin.senha == ""
-            ){
-                return MESSAGE.ERROR_REQUIRED_FIELDS
-            }else{
-                let JsonDadosLogin = {}
-                //encaminha os dados do novo sexo para ser inserido no banco de dados
-                let resultLogin = await usuarioDAO.loginUsuario(dadosLogin)
+        if (contentType === 'application/json') {
 
-                if(resultLogin != false || typeof(resultLogin) == 'object'){
-                    if(resultLogin.length > 0){
-    
-                        JsonDadosLogin.status = true
-                        JsonDadosLogin.status_code = 200
-                        JsonDadosLogin.usuario = resultLogin
-    
-                        return JsonDadosLogin//200
-                    }else{
-                        return MESSAGE.ERROR_NOT_FOUND//404
-                    }
-                }else{
-                    return MESSAGE.ERROR_INTERNAL_SERVER_MODEL//500
-                }
+            if (
+                !dadosLogin.email || dadosLogin.email.trim() === '' ||
+                !dadosLogin.senha || dadosLogin.senha.trim() === ''
+            ) {
+                return MESSAGE.ERROR_REQUIRED_FIELDS;
             }
-        }else{
-            return MESSAGE.ERROR_CONTENT_TYPE
+
+            // Tenta encontrar o usuário no banco
+            const resultLogin = await usuarioDAO.loginUsuario(dadosLogin);
+
+            if (resultLogin && typeof resultLogin === 'object' && resultLogin.length > 0) {
+                return {
+                    status: true,
+                    status_code: 200,
+                    usuario: resultLogin
+                };
+            } else {
+                return MESSAGE.ERROR_NOT_FOUND; // 404
+            }
+
+        } else {
+            return MESSAGE.ERROR_CONTENT_TYPE; // 415
         }
     } catch (error) {
-        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+        console.error("Erro no loginUsuario:", error);
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER; // 500
     }
 }
 

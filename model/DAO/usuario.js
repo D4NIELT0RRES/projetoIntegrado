@@ -227,5 +227,6 @@ module.exports = {
     selectByIdUsuario,
     selectByNomeUsuario,
     updatePassword,
-    loginUsuario
+    loginUsuario,
+    receberIdDoUsuario
 }

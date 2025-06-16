@@ -160,5 +160,39 @@ JOIN
 WHERE 
     riq.id_receita = 1;
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-
+ SELECT
+    r.*,
+    GROUP_CONCAT(c.id) AS classificacao_ids,
+    GROUP_CONCAT(c.nome SEPARATOR '; ') AS classificacao_nomes
+FROM
+    tbl_receita AS r
+LEFT JOIN
+    tbl_receita_classificacao AS rc ON r.id = rc.id_receita
+LEFT JOIN
+    tbl_classificacao AS c ON rc.id_classificacao = c.id
+WHERE
+    r.id_usuario = 2 -- ou remova esta linha se for selectAllReceita
+GROUP BY
+    r.id
+ORDER BY
+    r.id DESC;
+SELECT
+                r.*,
+                GROUP_CONCAT(c.id) AS classificacao_ids,
+                GROUP_CONCAT(c.nome SEPARATOR '; ') AS classificacao_nomes
+            FROM
+                tbl_receita AS r
+            LEFT JOIN
+                tbl_receita_classificacao AS rc ON r.id = rc.id_receita
+            LEFT JOIN
+                tbl_classificacao AS c ON rc.id_classificacao = c.id
+            WHERE
+                r.id_usuario = 2 -- <-- Certifique-se de que é EXATAMENTE ASSIM
+            GROUP BY
+                r.id
+            ORDER BY
+                r.id DESC;
+                
+                
+                
+                aaa

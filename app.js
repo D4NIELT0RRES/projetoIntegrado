@@ -202,6 +202,15 @@ app.get('/v1/controle-receita/receitaid/:id', cors(), async function (request,re
 
 })
 
+// Endpoint para listar receitas de um USUÁRIO por ID
+app.get('/usuario/:id/receitas', cors(), async function (request, response) {
+    let idUsuario = request.params.id;
+    let resultReceitas = await controllerReceita.listarReceitasDoUsuario(idUsuario);
+
+    response.status(resultReceitas.status_code);
+    response.json(resultReceitas);
+});
+
 //EndPoint para deletar uma receita pelo ID
 app.delete('/v1/controle-receita/receita/:id', cors(), async function (request,response) {
     
@@ -225,6 +234,8 @@ app.put('/v1/controle-receita/receita/:id', cors(), bodyParserJson, async functi
     response.json(resultReceita)
      
 })
+
+
 
 /******************************************************************************************************************/
 

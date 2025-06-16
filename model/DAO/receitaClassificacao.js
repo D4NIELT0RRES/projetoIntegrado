@@ -7,7 +7,6 @@
 
 //import da biblioteca do prisma client para executar os scripts SQL
 const { PrismaClient } = require('@prisma/client')
-const { ERROR_CONTENT_TYPE } = require('../../modulo/config')
 
 //Instancia (criar um objeto a ser utilizado) a biblioteca do prisma/client
 const prisma = new PrismaClient()
@@ -42,7 +41,6 @@ const insertReceitaClassificacao = async function (ReceitaClassificacao) {
 
 const updateReceitaClassificacao = async function (ReceitaClassificacao){
     try{
-        // Corrigido 'tlb_' para 'tbl_' no nome da tabela
         let sql = `UPDATE tbl_receita_classificacao SET 
                         id_receita = ${ReceitaClassificacao.id_receita},
                         id_classificacao = ${ReceitaClassificacao.id_classificacao}
@@ -64,7 +62,7 @@ const deleteReceitaClassificacao = async function (id){
     try {
         let sql = `DELETE FROM tbl_receita_classificacao WHERE id = ${id}`
 
-        let result = await prisma.$executeRawUnsafe(sql)  // faltava o await e definição da variável result
+        let result = await prisma.$executeRawUnsafe(sql)
         
         if (result){
             return true
@@ -95,7 +93,6 @@ const selectAllReceitaClassificacao = async function (){
 
 const selectByIdReceitaClassificacao = async function (id) {
     try {
-        // Corrigido a query para WHERE id = ${id}
         let sql = `SELECT * FROM tbl_receita_classificacao WHERE id = ${id}`
 
         let result = await prisma.$queryRawUnsafe(sql)
@@ -135,50 +132,67 @@ const selectReceitaByIdClassificacao = async function (idClassificacao) {
     }
 }
 
+// **** FUNÇÃO ATUALIZADA AQUI PARA INCLUIR O NOME DA CLASSIFICAÇÃO ****
 const selectClassificacaoByIdReceita = async function (idReceita) {
     try {
         let sql = `
-            SELECT tbl_classificacao.*
-            FROM tbl_receita_classificacao
-            INNER JOIN tbl_classificacao
-              ON tbl_receita_classificacao.id_classificacao = tbl_classificacao.id
-            WHERE tbl_receita_classificacao.id_receita = ${idReceita};
-        `
-        let result = await prisma.$queryRawUnsafe(sql) // faltava await
+            SELECT 
+                rc.id_classificacao AS id_classificacao,
+                c.nome AS nome
+            FROM
+                tbl_receita_classificacao AS rc
+            INNER JOIN
+                tbl_classificacao AS c ON rc.id_classificacao = c.id
+            WHERE
+                rc.id_receita = ${idReceita};
+        `;
+        let result = await prisma.$queryRawUnsafe(sql);
         if (result) {
-            return result
+            return result; // Retorna a lista de objetos com { id_classificacao, nome }
         } else {
-            return false
+            return false;
         }
     } catch (error) {
-        console.error('Erro no selectClassificacaoByIdReceita:', error)
-        return false
+        console.error('Erro no selectClassificacaoByIdReceita:', error);
+        return false;
     }
-}
+};
 
-const selectUsuarioByIdReceita = async function (idReceita) {
-    try {
-        let sql = `
-            SELECT tbl_usuario.* 
-            FROM tbl_usuario
-            INNER JOIN tbl_receita_classificacao
-                ON tbl_usuario.id = tbl_receita_classificacao.id_usuario
-            INNER JOIN tbl_receita
-                ON tbl_receita.id = tbl_receita_classificacao.id_receita
-            WHERE tbl_receita.id = ${idReceita};
-        `
+// **** FUNÇÃO COMENTADA E RECOMENDAÇÃO DE REVISÃO (NÃO DEVE ESTAR AQUI) ****
+/*
+A função selectUsuarioByIdReceita está usando tbl_receita_classificacao
+para encontrar o usuário da receita. O usuário da receita está diretamente
+na tbl_receita, não na tabela N/N de classificação.
+Recomenda-se mover esta lógica para o DAO da Receita (receita.js)
+e alterar a query para:
+    SELECT tbl_usuario.* FROM tbl_usuario
+    INNER JOIN tbl_receita
+        ON tbl_usuario.id = tbl_receita.id_usuario
+    WHERE tbl_receita.id = ${idReceita};
+*/
+// const selectUsuarioByIdReceita = async function (idReceita) {
+//     try {
+//         let sql = `
+//             SELECT tbl_usuario.* //             FROM tbl_usuario
+//             INNER JOIN tbl_receita_classificacao
+//                 ON tbl_usuario.id = tbl_receita_classificacao.id_usuario 
+//             INNER JOIN tbl_receita
+//                 ON tbl_receita.id = tbl_receita_classificacao.id_receita 
+//             WHERE tbl_receita.id = ${idReceita};
+//         `
 
-        let result = await prisma.$queryRawUnsafe(sql) // faltava await
+//         let result = await prisma.$queryRawUnsafe(sql)
 
-        if(result){
-            return result
-        }else{
-            return false
-        }
-    } catch (error) {
-        return false
-    }
-}
+//         if(result){
+//             return result
+//         }else{
+//             return false
+//         }
+//     } catch (error) {
+//         return false
+//     }
+// }
+
 
 module.exports = {
     insertReceitaClassificacao,
@@ -188,5 +202,5 @@ module.exports = {
     selectByIdReceitaClassificacao,
     selectReceitaByIdClassificacao,
     selectClassificacaoByIdReceita,
-    selectUsuarioByIdReceita
-}
+    // selectUsuarioByIdReceita // Comentado no module.exports também
+};
