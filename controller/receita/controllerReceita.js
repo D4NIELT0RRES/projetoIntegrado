@@ -176,32 +176,58 @@ const listarReceita = async function() {
         const arrayReceitas = []
         let dadosReceitas = {}
 
-        let resultReceita = await receitaDAO.selectAllReceita()
+        console.log("DEBUG: Chamando selectAllReceita...");
+        let resultReceita = await receitaDAO.selectAllReceita();
+        console.log("DEBUG: selectAllReceita retornou. Quantidade de receitas:", resultReceita ? resultReceita.length : 0);
 
-        if(resultReceita != false && typeof(resultReceita) == 'object'){
+
+        if(resultReceita !== false && typeof(resultReceita) === 'object' && resultReceita !== null){ // Melhorias na validação
             if(resultReceita.length > 0){
                 dadosReceitas.status = true
                 dadosReceitas.status_code = 200
-                dadosReceitas.items = arrayReceitas
+                dadosReceitas.items = resultReceita.length; // Atualizado para mostrar o número total de itens
 
                 for (let itemReceita of resultReceita) {
+                    console.log("DEBUG: Processando receita ID:", itemReceita.id, " - Titulo:", itemReceita.titulo);
+                    console.log("DEBUG: ID do usuário da receita:", itemReceita.id_usuario);
+
                     // Buscar o usuário e associar
-                    let dadosUsuario = await controllerUsuario.buscarUsuario(itemReceita.id_usuario)
+                    let dadosUsuario = null;
+                    if (itemReceita.id_usuario) { // Garante que id_usuario não é null/undefined/0
+                        dadosUsuario = await controllerUsuario.buscarUsuario(itemReceita.id_usuario);
+                    }
+                    
                     // Garante que usuario seja um objeto (primeiro elemento do array, se for array)
-                    itemReceita.usuario = dadosUsuario.usuario && dadosUsuario.usuario.length > 0 ? dadosUsuario.usuario[0] : null; 
-                    delete itemReceita.id_usuario
+                    // Verifica se dadosUsuario existe e se tem a propriedade 'usuario' que é um array não vazio
+                    itemReceita.usuario = (dadosUsuario && dadosUsuario.usuario && dadosUsuario.usuario.length > 0) ? dadosUsuario.usuario[0] : null; 
+                    delete itemReceita.id_usuario // Remove o ID original do usuário, já que o objeto completo foi adicionado
+
+                    console.log("DEBUG: Usuário após busca:", itemReceita.usuario ? itemReceita.usuario.nome_usuario : "N/A");
+
 
                     // Buscar classificações da receita pelo id da receita
-                    let dadosClassificacao = await controllerReceitaClassificacao.buscarClassificacaoPorReceita(itemReceita.id)
+                    let dadosClassificacao = null;
+                    if (itemReceita.id) { // Garante que o ID da receita existe
+                        dadosClassificacao = await controllerReceitaClassificacao.buscarClassificacaoPorReceita(itemReceita.id);
+                    }
+                    
+                    console.log("DEBUG: Classificação após busca para receita ID", itemReceita.id, ":", dadosClassificacao);
 
                     // **** AQUI: Configura a saída JSON para as classificações ****
-                    if (dadosClassificacao.status && dadosClassificacao.classificacao && dadosClassificacao.classificacao.length > 0) {
+                    if (dadosClassificacao && dadosClassificacao.status && dadosClassificacao.classificacao && dadosClassificacao.classificacao.length > 0) {
                         // Campo "classificacao" como array de objetos {id_classificacao: X}
-                        itemReceita.classificacao = dadosClassificacao.classificacao.map(cls => ({
-                            id_classificacao: cls.id_classificacao
-                        }));
+                        itemReceita.classificacao = dadosClassificacao.classificacao.map(cls => {
+                            // Verifica se cls é válido e tem id_classificacao antes de mapear
+                            if (cls && typeof cls === 'object' && cls.id_classificacao) {
+                                return { id_classificacao: cls.id_classificacao };
+                            }
+                            console.warn("AVISO: Objeto de classificação inválido encontrado:", cls);
+                            return null; // Retorna null para este item inválido, será filtrado depois
+                        }).filter(cls => cls !== null); // Filtra quaisquer itens nulos resultantes do mapeamento
+
                         // Campo "classificacao_nome" com o nome da primeira classificação
-                        itemReceita.classificacao_nome = dadosClassificacao.classificacao[0].nome;
+                        // Garante que o primeiro elemento do array 'classificacao' exista antes de acessar 'nome'
+                        itemReceita.classificacao_nome = dadosClassificacao.classificacao[0] && dadosClassificacao.classificacao[0].nome ? dadosClassificacao.classificacao[0].nome : null;
                     } else {
                         itemReceita.classificacao = []; // Garante que a propriedade exista, mesmo vazia
                         itemReceita.classificacao_nome = null; // Se não há classificações, o nome é null
@@ -213,17 +239,20 @@ const listarReceita = async function() {
                     arrayReceitas.push(itemReceita)
                 }
 
-                return dadosReceitas
+                dadosReceitas.receitas = arrayReceitas; // Adicionado para manter o padrão de resposta (receitasPublicadas)
+                return dadosReceitas;
             } else {
-                return MESSAGE.ERROR_NOT_FOUND
+                return MESSAGE.ERROR_NOT_FOUND; // Retorna 404 se não houver receitas
             }
         } else {
-            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
+            // Este caso (resultReceita false/não objeto) geralmente indica um problema no DAO ou DB
+            console.error("Erro: selectAllReceita não retornou resultados válidos ou houve erro no DAO.");
+            return MESSAGE.ERROR_INTERNAL_SERVER_MODEL; // 500
         }
 
     } catch (error) {
-        console.error("Erro em listarReceita:", error); // Adicionado log de erro
-        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER   
+        console.error("Erro em listarReceita:", error); // Adicionado log de erro para capturar exceções
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER; // 500
     }
 }
 
@@ -365,7 +394,7 @@ const listarReceitasDoUsuario = async function(idUsuario){
                 // Buscar classificações da receita pelo id da receita
                 let dadosClassificacao = await controllerReceitaClassificacao.buscarClassificacaoPorReceita(itemReceita.id);
                 
-                // **** AQUI: Configura a saída JSON para as classificações ****
+                // **** Configura a saída JSON para as classificações ****
                 if (dadosClassificacao.status && dadosClassificacao.classificacao && dadosClassificacao.classificacao.length > 0) {
                     itemReceita.classificacao = dadosClassificacao.classificacao.map(cls => ({
                         id_classificacao: cls.id_classificacao 
@@ -376,7 +405,6 @@ const listarReceitasDoUsuario = async function(idUsuario){
                     itemReceita.classificacao_nome = null;
                 }
                 delete itemReceita.classificacoes; 
-                // **** FIM DA CONFIGURAÇÃO ****
 
                 receitasComDetalhes.push(itemReceita);
             }
@@ -384,7 +412,8 @@ const listarReceitasDoUsuario = async function(idUsuario){
             response.status = true;
             response.status_code = 200;
             response.message = "Receitas do usuário encontradas com sucesso.";
-            response.receitasPublicadas = receitasComDetalhes;
+            // **CORREÇÃO AQUI:** Mude de receitasPublicadas para 'receitas'
+            response.receitas = receitasComDetalhes; // <--- MUDANÇA CRÍTICA AQUI!
         } else { 
             response.status_code = 404;
             response.message = "Nenhuma receita encontrada para este usuário ou erro na consulta.";
@@ -396,6 +425,107 @@ const listarReceitasDoUsuario = async function(idUsuario){
     }
 }
 
+// **NOVA FUNÇÃO PARA PESQUISA POR TERMO**
+const buscarReceitaPorTermo = async function(termo) {
+    let response = { status: false, status_code: 500, message: "Erro interno do servidor." };
+
+    if (termo === undefined || termo === '' || termo === null || typeof termo !== 'string') {
+        response.status_code = 400;
+        response.message = "Termo de pesquisa inválido ou vazio.";
+        return response;
+    }
+
+    try {
+        let resultReceita = await receitaDAO.selectReceitasByTermo(termo);
+
+        if (resultReceita && resultReceita.length > 0) {
+            const receitasComDetalhes = [];
+            for (let itemReceita of resultReceita) {
+                let dadosUsuario = await controllerUsuario.buscarUsuario(itemReceita.id_usuario);
+                itemReceita.usuario = dadosUsuario.usuario && dadosUsuario.usuario.length > 0 ? dadosUsuario.usuario[0] : null; 
+                delete itemReceita.id_usuario;
+
+                let dadosClassificacao = await controllerReceitaClassificacao.buscarClassificacaoPorReceita(itemReceita.id);
+                if (dadosClassificacao.status && dadosClassificacao.classificacao && dadosClassificacao.classificacao.length > 0) {
+                    itemReceita.classificacao = dadosClassificacao.classificacao.map(cls => ({
+                        id_classificacao: cls.id_classificacao
+                    }));
+                    itemReceita.classificacao_nome = dadosClassificacao.classificacao[0].nome;
+                } else {
+                    itemReceita.classificacao = [];
+                    itemReceita.classificacao_nome = null;
+                }
+                delete itemReceita.classificacoes; 
+
+                receitasComDetalhes.push(itemReceita);
+            }
+
+            response.status = true;
+            response.status_code = 200;
+            response.message = "Receitas encontradas com base no termo de pesquisa.";
+            response.receitas = receitasComDetalhes;
+        } else {
+            response.status_code = 404;
+            response.message = "Nenhuma receita encontrada para o termo de pesquisa fornecido.";
+        }
+        return response;
+    } catch (error) {
+        console.error("Erro no controller ao buscar receitas por termo:", error);
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER;
+    }
+};
+
+// **NOVA FUNÇÃO PARA FILTRO POR CLASSIFICAÇÃO**
+const listarReceitasPorClassificacao = async function(idClassificacao) {
+    let response = { status: false, status_code: 500, message: "Erro interno do servidor." };
+
+    if (idClassificacao === undefined || idClassificacao === '' || idClassificacao === null || isNaN(idClassificacao) || Number(idClassificacao) <= 0) {
+        response.status_code = 400;
+        response.message = "ID de classificação inválido.";
+        return response;
+    }
+
+    try {
+        let resultReceita = await receitaDAO.selectReceitasByClassificacaoId(Number(idClassificacao));
+
+        if (resultReceita && resultReceita.length > 0) {
+            const receitasComDetalhes = [];
+            for (let itemReceita of resultReceita) {
+                let dadosUsuario = await controllerUsuario.buscarUsuario(itemReceita.id_usuario);
+                itemReceita.usuario = dadosUsuario.usuario && dadosUsuario.usuario.length > 0 ? dadosUsuario.usuario[0] : null; 
+                delete itemReceita.id_usuario;
+
+                let dadosClassificacao = await controllerReceitaClassificacao.buscarClassificacaoPorReceita(itemReceita.id);
+                if (dadosClassificacao.status && dadosClassificacao.classificacao && dadosClassificacao.classificacao.length > 0) {
+                    itemReceita.classificacao = dadosClassificacao.classificacao.map(cls => ({
+                        id_classificacao: cls.id_classificacao
+                    }));
+                    itemReceita.classificacao_nome = dadosClassificacao.classificacao[0].nome;
+                } else {
+                    itemReceita.classificacao = [];
+                    itemReceita.classificacao_nome = null;
+                }
+                delete itemReceita.classificacoes; 
+
+                receitasComDetalhes.push(itemReceita);
+            }
+
+            response.status = true;
+            response.status_code = 200;
+            response.message = "Receitas encontradas para a classificação especificada.";
+            response.receitas = receitasComDetalhes;
+        } else {
+            response.status_code = 404;
+            response.message = "Nenhuma receita encontrada para esta classificação.";
+        }
+        return response;
+    } catch (error) {
+        console.error("Erro no controller ao listar receitas por classificação:", error);
+        return MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER;
+    }
+};
+
+
 module.exports = {
     inserirReceita,
     atualizarReceita,
@@ -403,5 +533,7 @@ module.exports = {
     listarReceita,
     buscarReceita,
     listarReceitaByUsername,
-    listarReceitasDoUsuario
+    listarReceitasDoUsuario,
+    buscarReceitaPorTermo,        // <-- Adicione esta linha
+    listarReceitasPorClassificacao
 }

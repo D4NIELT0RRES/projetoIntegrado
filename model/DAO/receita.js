@@ -146,7 +146,51 @@ const selectReceitasByUsuarioId = async function (idUsuario) {
         console.error("Erro ao buscar receitas por ID de usuário:", error);
         return false;
     }
+}
+
+const selectReceitasByTermo = async function (termo) {
+    try {
+        // Cuidado com SQL Injection ao usar o termo diretamente na query.
+        // Se possível, use binding de parâmetros se o Prisma.$queryRaw ou equivalente suportar para LIKE.
+        // Exemplo:
+        // let result = await prisma.$queryRaw`
+        //     SELECT * FROM tbl_receita
+        //     WHERE titulo LIKE CONCAT('%', ${termo}, '%')
+        //     OR ingrediente LIKE CONCAT('%', ${termo}, '%')
+        //     OR modo_preparo LIKE CONCAT('%', ${termo}, '%');
+        // `;
+        // Se não, você pode precisar sanitizar o 'termo' ou usar uma biblioteca para isso.
+
+        let sql = `
+            SELECT * FROM tbl_receita
+            WHERE titulo LIKE '%${termo}%'
+            OR ingrediente LIKE '%${termo}%'
+            OR modo_preparo LIKE '%${termo}%';
+        `;
+        let result = await prisma.$queryRawUnsafe(sql);
+        return result && result.length > 0 ? result : false;
+    } catch (error) {
+        console.error("Erro ao buscar receitas por termo:", error);
+        return false;
+    }
 };
+
+// **NOVA FUNÇÃO PARA FILTRO POR CLASSIFICAÇÃO**
+const selectReceitasByClassificacaoId = async function (idClassificacao) {
+    try {
+        let sql = `
+            SELECT r.*
+            FROM tbl_receita AS r
+            JOIN tbl_receita_classificacao AS rc ON r.id = rc.id_receita
+            WHERE rc.id_classificacao = ${Number(idClassificacao)};
+        `;
+        let result = await prisma.$queryRawUnsafe(sql);
+        return result && result.length > 0 ? result : false;
+    } catch (error) {
+        console.error("Erro ao buscar receitas por ID de classificação:", error);
+        return false;
+    }
+}
 
 module.exports = {
     insertReceita,
@@ -155,5 +199,7 @@ module.exports = {
     selectAllReceita,
     selectByIdReceita,
     selectByUserName,
-    selectReceitasByUsuarioId
-};
+    selectReceitasByUsuarioId,
+    selectReceitasByTermo,         // <-- Adicione esta linha
+    selectReceitasByClassificacaoId
+}

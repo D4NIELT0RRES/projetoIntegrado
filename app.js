@@ -151,6 +151,22 @@ app.post('/v1/controle-receita/login', cors(), bodyParserJson, async function (r
     response.json(resultLogin)
 })
 
+// **NOVO ENDPOINT PARA BUSCA DE RECEITAS POR TERMO**
+app.get('/v1/controle-receita/search', cors(), async function (request, res) {
+    // Pega o termo de pesquisa da query string (ex: /search?termo=bolo)
+    let termo = request.query.termo; 
+    let result = await controllerReceita.buscarReceitaPorTermo(termo);
+    res.status(result.status_code).json(result);
+});
+
+// **NOVO ENDPOINT PARA FILTRAR RECEITAS POR CLASSIFICAÇÃO (CATEGORIA)**
+app.get('/v1/controle-receita/category/:idClassificacao', cors(), async function (request, res) {
+    // Pega o ID da classificação do parâmetro da URL
+    let idClassificacao = request.params.idClassificacao; 
+    let result = await controllerReceita.listarReceitasPorClassificacao(idClassificacao);
+    res.status(result.status_code).json(result);
+});
+
 /******************************************************************************************************************/
 
 // Endpoint para inserir uma receita
@@ -168,8 +184,6 @@ app.post('/v1/controle-receita/receita', cors(), bodyParserJson, async function 
     response.status(resultReceita.status_code);
     response.json(resultReceita);
 });
-
-
 
 //EndPoint para listar receita no banco de dados 
 app.get('/v1/controle-receita/receita', cors(), bodyParserJson, async function (request, response) {
